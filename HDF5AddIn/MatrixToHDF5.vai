@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<VisumAddInCollection Format="1.0.0">
+		<VisumAddIn>
+			<AddInID>MatrixToHDF5</AddInID>
+			<AddInName>Matrix als HDF5</AddInName>			<!-- todo AddInPath is not used yet -->
+			<AddInPath>Matrix</AddInPath>
+			<AddInParaDlgScript>MatrixToHDF5Dlg.py</AddInParaDlgScript>
+			<AddInBodyScript>MatrixToHDF5Body.py</AddInBodyScript>
+			<AddInOperation>true</AddInOperation>
+			<AddInAutoMenu>true</AddInAutoMenu>
+			<AddInAutoShowPara>true</AddInAutoShowPara>
+		</VisumAddIn>
+</VisumAddInCollection>
