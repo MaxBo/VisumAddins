@@ -1,9 +1,11 @@
 # -*- coding: utf8 -*-
 #------------------------------------------------------------------------------
 # Name:        VISUM Matrices to HDF5 for each time
-# Purpose:
+# Purpose:     Berechnet ÖV Kenngrößen nach vordefiniertem Verfahrem und Zeitscheiben
+#              Speichert alle Kenngrößenmatrizen je berechneter Zeitscheibe in HDF5 Datei
+#              -> nicht berechnete Matrizen erhalten in jeder Zeitscheibe den zuvor berechneten Wert
 #
-# Author:      Barcelona
+# Author:      Nina Kohnen
 #
 # Created:     03.04.2013
 # Copyright:   (c) Barcelona 2013
@@ -37,40 +39,52 @@ def Run(param):
         i.append(3)
     if param["Zeitscheibe5"]:
         i.append(4)
-    if param["Zeitscheibe6"]:
-        i.append(5)
 ##Was machen wir mit diesem FAll???
     if param["Zeitscheibe24"]:
-        i.append(6)
+        i.append(5)
 
     #File Path from MatrixToHDF5Dlg
     filepath = param['filepath']
-
+    
+    
+    #Set Zeitscheiben - (COM Docu:99)
+    Visum.Procedures.OpenXmlWithOptions(r'C:\Users\Barcelona\AppData\Roaming\Visum\125\Addins\zeitscheiben_addin.xml', 0,1)
+    #Import Operation - (COM Docu:99)
+    Visum.Procedures.OpenXmlWithOptions(r'C:\Users\Barcelona\AppData\Roaming\Visum\125\Addins\verfahren3.xml', 1,0,2)
+    
     # For each i:
     for item in i:
         #Get start/end Time from Analysezeiträume
-        """Zeitscheiben müssen vorher einmal als
-        Analyseverfahrensparameter eingeladen werden."""
-        ##Evtl. noch automatisieren
         f = Visum.Procedures.Functions
         at = f.AnalysisTimes
-        a = at.TimeInterval(item + 1)  # auswahl Zeitinterval
+        a = at.TimeInterval(item + 1)  # auswahl Zeitintervall
         start = a.AttValue('StartTime')
         end = a.AttValue('EndTime')
-        if item == 6:
+        if item == 5:
             start = 0
-            end = 2800*24-1
-
-        #calculate Skimmatrix
+            end = 3600*24-1
+            
+        #Get Operation
         operations = Visum.Procedures.Operations
-        op = operations.AddOperation(1)
-        op.SetAttValue('OperationType', 102)
-        # # In Tabelle auf S. 113/114 nachschauen
+        op = operations.ItemByKey(1)
+        
+        #calculate Skimmatrix
+        ##operations = Visum.Procedures.Operations
+        ##op = operations.AddOperation(1)
+        ##op.SetAttValue('OperationType', 102)
+
+        
+        # Set Parameters ->In Tabelle auf S. 113/114 nachschauen
         put_ckmp = op.PuTCalcSkimMatrixParameters
         ttp = put_ckmp.TimetableBasedParameters
         ttbp = ttp.BaseParameters
         ttbp.SetTimeIntervalStart(start)  # Time in seconds
         ttbp.SetTimeIntervalEnd(end)    # Time in Seconds
+        
+        #setcurrentOperation
+        Visum.Procedures.OperationExecutor.SetCurrentOperation(1)
+        Visum.Procedures.OperationExecutor.ExecuteCurrentOperation()
+
 
         # Open File
         with tables.openFile(filepath, 'a') as h:
@@ -95,7 +109,7 @@ def Run(param):
                     #Matrix als Numpy array (hat funktion shape)
                     data = VisumPy.helpers.GetMatrix(Visum, no)
 
-                    addIn.ReportMessage(name)
+                    #addIn.ReportMessage(data)
                     try:
                         # Existiert der Knoten(Tabelle)
                         table_in_hdf5 = h.getNode(root, name)
@@ -105,9 +119,9 @@ def Run(param):
                         m_shape = data.shape          # Get Shape
                         m_row = m_shape[0]             # Get Row Number
                         m_col = m_shape[1]              # Get Col Number
-                        zeit = 6
+                        zeit = 5
                         # if 24 h
-                        if item == 6:
+                        if item == 5:
                             zeit = 1
                         arr_shape = (zeit, m_row, m_col)
 
@@ -119,7 +133,7 @@ def Run(param):
                         table_in_hdf5 = h.createArray(root, name, arr)
 
                     # Fill table with Matrix
-                    if item == 6:
+                    if item == 5:
                         table_in_hdf5[0] = data
                     else:
                         table_in_hdf5[item] = data

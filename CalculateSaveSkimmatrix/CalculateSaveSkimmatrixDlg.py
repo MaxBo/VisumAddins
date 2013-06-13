@@ -48,21 +48,21 @@ class Example(wx.Dialog):
 
         #Radiobuttons
         self.label_1 = wx.StaticText(pnl, -1, ("Zeitscheibe:"), pos=(15, 15))
-        self.label_zeit = wx.StaticText(pnl, -1, (u"(Zeitscheiben müssen als \n"
-        u"Analyseverfahrensparameter \n"
-        u"eingeladen werden)"), pos=(120, 15))
-        self.z1 = wx.CheckBox(pnl, label='0-6', pos=(15, 30))
+        #self.label_zeit = wx.StaticText(pnl, -1, (u"(Zeitscheiben müssen als \n"
+        #u"Analyseverfahrensparameter \n"
+        #u"eingeladen werden)"), pos=(120, 15))
+        self.z1 = wx.CheckBox(pnl, label='0-9', pos=(15, 30))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z1.GetId())
-        self.z2 = wx.CheckBox(pnl, label='6-8', pos=(15, 45))
+        self.z2 = wx.CheckBox(pnl, label='9-12', pos=(15, 45))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z2.GetId())
-        self.z3 = wx.CheckBox(pnl, label='8-12', pos=(15, 60))
+        self.z3 = wx.CheckBox(pnl, label='12-15', pos=(15, 60))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z3.GetId())
-        self.z4 = wx.CheckBox(pnl, label='12-15', pos=(15, 75))
+        self.z4 = wx.CheckBox(pnl, label='15-19', pos=(15, 75))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z4.GetId())
-        self.z5 = wx.CheckBox(pnl, label='15-19', pos=(15, 90))
+        self.z5 = wx.CheckBox(pnl, label='19-24', pos=(15, 90))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z5.GetId())
-        self.z6 = wx.CheckBox(pnl, label='19-24', pos=(15, 105))
-        self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z6.GetId())
+        #self.z6 = wx.CheckBox(pnl, label='19-24', pos=(15, 105))
+        #self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z6.GetId())
         self.z24 = wx.CheckBox(pnl, label='0-24', pos=(15, 125))
         self.Bind(wx.EVT_CHECKBOX, self.enable_16, id=self.z24.GetId())
 
@@ -85,7 +85,7 @@ class Example(wx.Dialog):
 
         #Buttons
         hbox2 = wx.BoxSizer(wx.HORIZONTAL)
-        okButton = wx.Button(self, label='Ok')
+        okButton = wx.Button(self, label='OK')
         closeButton = wx.Button(self, label='Abbrechen')
 
         hbox2.Add(okButton)
@@ -124,7 +124,7 @@ class Example(wx.Dialog):
         param["Zeitscheibe3"] = self.z3.GetValue()
         param["Zeitscheibe4"] = self.z4.GetValue()
         param["Zeitscheibe5"] = self.z5.GetValue()
-        param["Zeitscheibe6"] = self.z6.GetValue()
+        #param["Zeitscheibe6"] = self.z6.GetValue()
         param["Zeitscheibe24"] = self.z24.GetValue()
         param["filepath"] = self.openButton.GetValue()
 
@@ -146,14 +146,14 @@ class Example(wx.Dialog):
         state3 = str(self.z3.GetValue())
         state4 = str(self.z4.GetValue())
         state5 = str(self.z5.GetValue())
-        state6 = str(self.z6.GetValue())
+        #state6 = str(self.z6.GetValue())
         state24 = str(self.z24.GetValue())
         self.statusbar.SetStatusText(state1, 0)
         self.statusbar.SetStatusText(state2, 1)
         self.statusbar.SetStatusText(state3, 2)
         self.statusbar.SetStatusText(state4, 3)
         self.statusbar.SetStatusText(state5, 4)
-        self.statusbar.SetStatusText(state6, 5)
+        #self.statusbar.SetStatusText(state6, 5)
         self.statusbar.SetStatusText(state24, 6)
 
     def enable_24(self, evt):
@@ -165,7 +165,7 @@ class Example(wx.Dialog):
         self.z3.Enable(False)
         self.z4.Enable(False)
         self.z5.Enable(False)
-        self.z6.Enable(False)
+        #self.z6.Enable(False)
 
 
 if len(sys.argv) > 1:
