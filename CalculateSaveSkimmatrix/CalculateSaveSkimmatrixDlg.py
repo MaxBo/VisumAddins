@@ -103,7 +103,7 @@ class Example(wx.Dialog):
         closeButton.Bind(wx.EVT_BUTTON, self.On_cancel)
 
         self.SetSize((300, 300))
-        self.SetTitle('Nachfragemodell')
+        self.SetTitle(r'Kenngrößen berechnen und speichern')
         self.Centre()
         self.Show(True)
 

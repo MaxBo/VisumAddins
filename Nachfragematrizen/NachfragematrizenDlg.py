@@ -42,29 +42,30 @@ class ParamsDlg(wx.Dialog):
 
         #Input
         """Checkboxen"""
-        self.kcalc = wx.CheckBox(self, label=u'Starte Kenngrößenberechnung und speichern als in HDF5',
-                                 pos=(15,15))
-        self.kcalc.SetValue(True)
-        self.modelsplit = wx.CheckBox(self, label=u'Model Split/ Wegelängen neu kalibrieren',
-                                      id=2,
-                                      pos=(15,350))
-        self.iv = wx.CheckBox(self, label=u'Rückkopplung mit IV Nachfrage',
-                                      id=2,
-                                      pos=(15,375))
-        self.iv.SetValue(True)
+        ##self.kcalc = wx.CheckBox(self, label=u'Starte Kenngrößenberechnung und speichern als in HDF5',
+         ##                        pos=(15,15))
+        ##self.kcalc.SetValue(True)
+        ##self.modelsplit = wx.CheckBox(self, label=u'Model Split/ Wegelängen neu kalibrieren',
+        ##                              id=2,
+         ##                             pos=(15,350))
+        #self.iv = wx.CheckBox(self, label=u'Rückkopplung mit IV Nachfrage',
+                                      #id=2,
+                                      #pos=(15,375))
+        #self.iv.SetValue(True)
 
         # Combo Box Config Files
         """Get *.py from Combobox and execute *.py"""
-        self.label_conf = wx.StaticText(self, -1, _('Konfiguration'), pos=(15,50))
+        self.label_conf = wx.StaticText(self, -1, _('Konfiguration:'), pos=(15,50))
         choices = os.listdir(r'C:\Users\Public\Documents\VisumAddInTest')
         e_files = [f for f in choices if f.startswith('e')]
         self.cboMatrix = wx.ComboBox(self, -1,
                                      choices=e_files,
+                                     size=(175, -1),
                                      style=wx.CB_DROPDOWN | wx.CB_DROPDOWN,
-                                     pos=(100,50))
+                                     pos=(100,45))
         self.cboMatrix.SetSelection(0)
 
-        self.btn_conf = wx.Button(self, -1, _("Auswahl"), pos = (250, 50))
+        self.btn_conf = wx.Button(self, -1, _(u'Übernehmen'), pos = (280, 45))
         self.Bind(wx.EVT_BUTTON, self.On_CONF, self.btn_conf)
 
 
@@ -77,46 +78,46 @@ class ParamsDlg(wx.Dialog):
 
         # Open File Buttons
         self.openKenn = wxfb.FileBrowseButton(self, buttonText = u'Öffnen',
-                                              labelText = u'Kenngrößenmatrix',
-                                              labelWidth = 200,
+                                              labelText = u'Kenngrößenmatrix:     ',
+                                              labelWidth = 250,
                                               fileMode=wx.OPEN,
                                               fileMask='*.h5',
                                               startDirectory=directory_kenn,
-                                              pos=(125,100))
+                                              pos=(50,125))
         # Set Value for Open Button -------- Soll in Config Datei ausgeführt werden
         self.openKenn.SetValue(u'W:\mobil\64 Zwischenablage Nina\Visum_Addins\24.hdf5')
         self.openStruktur = wxfb.FileBrowseButton(self, buttonText=u'Öffnen',
-                                                  labelText=u'Strukturdaten       ',
-                                                  labelWidth=200,
+                                                  labelText=u'Strukturdaten:              ',
+                                                  labelWidth=250,
                                                   fileMode=wx.OPEN,
                                                   fileMask='*.h5',
                                                   startDirectory=directory_struktur ,
-                                                  pos=(125,125))
+                                                  pos=(50,155))
         self.openSzenario = wxfb.FileBrowseButton(self, buttonText=u'Öffnen',
-                                                  labelText=u'Szenario                 ',
-                                                  labelWidth=200,
+                                                  labelText=u'IV Kenngrößen:            ',
+                                                  labelWidth=250,
                                                   fileMode=wx.OPEN,
                                                   fileMask='*.h5',
                                                   startDirectory=directory_szenario,
-                                                  pos=(125,150))
+                                                  pos=(50,185))
 
 
         """SET Szenario Name and Save"""
-        self.label1 = wx.StaticText(self, -1, _("Szenario Namen:"), pos=(15, 260))
+        self.label1 = wx.StaticText(self, -1, _("Szenario Namen eingeben:"), pos=(15, 280))
         self.name1 = wx.TextCtrl(self, -1,
-                                size=(100, -1),
-                                pos=(125,255))
+                                size=(200, -1),
+                                pos=(175,275))
 
-        self.btn_name = wx.Button(self, -1, _("Auswahl"), pos = (230,255))
-        self.Bind(wx.EVT_BUTTON, self.On_NAME, self.btn_name)
+        #self.btn_name = wx.Button(self, -1, _("Auswahl"), pos = (230,255))
+        #self.Bind(wx.EVT_BUTTON, self.On_NAME, self.btn_name)
                 # Save File Button
-        self.saveButton = wxfb.FileBrowseButton(self, buttonText = u'Speichern unter',
-                                                labelText = u'Szenario speichern:',
-                                                labelWidth = 200,
-                                                fileMode=wx.SAVE,
-                                                fileMask= '*.h5',
-                                                startDirectory=directory ,
-                                                pos=(125,275))
+        #self.saveButton = wxfb.FileBrowseButton(self, buttonText = u'Speichern unter',
+         #                                       labelText = u'Szenario speichern:',
+          #                                      labelWidth = 200,
+           #                                     fileMode=wx.SAVE,
+            #                                    fileMask= '*.h5',
+             #                                   startDirectory=directory ,
+              #                                  pos=(125,275))
 
 
         # OK and Cancel
@@ -136,7 +137,7 @@ class ParamsDlg(wx.Dialog):
 
     def On_NAME(self, event):
         name = self.name1.GetValue()
-        win.MessageBox(0, name)
+        #win.MessageBox(0, name)
         directory = r'C:/Users/Public/Documents/VisumAddInTest/'
         self.saveButton.SetValue(directory+name+'.h5')
 
@@ -152,17 +153,17 @@ class ParamsDlg(wx.Dialog):
             # Checkboxen
         param["hdf5_save"] = self.kcalc.GetValue()
         param["modelsplit"] = self.modelsplit.GetValue()
-        param["iv"] = self.iv.GetValue()
+        ##param["iv"] = self.iv.GetValue()
             # HDF5 Filepaths
-        param["Kanngrößenmatrizen"] = str(self.openKenn.GetValue())
+        param["Kenngrößenmatrizen"] = str(self.openKenn.GetValue())
         param["Strukturdaten"] = str(self.openStruktur.GetValue())
         param["Szenario"] = str(self.openSzenario.GetValue())
             # Speichern
         param["Name"] = str(self.name1.GetValue())
-        param["Savepath"] = str(self.saveButton.GetValue())
+        #param["Savepath"] = str(self.saveButton.GetValue())
 
 
-
+        addInParam.SaveParameter(param)
         if not addIn.IsInDebugMode:
             Terminated.set()
         else: # Start body script manually
