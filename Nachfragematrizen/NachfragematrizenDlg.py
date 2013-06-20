@@ -45,9 +45,9 @@ class ParamsDlg(wx.Dialog):
         ##self.kcalc = wx.CheckBox(self, label=u'Starte Kenngrößenberechnung und speichern als in HDF5',
          ##                        pos=(15,15))
         ##self.kcalc.SetValue(True)
-        ##self.modelsplit = wx.CheckBox(self, label=u'Model Split/ Wegelängen neu kalibrieren',
-        ##                              id=2,
-         ##                             pos=(15,350))
+        self.modelsplit = wx.CheckBox(self, label=u'Model Split/ Wegelängen neu kalibrieren',
+                                      id=2,
+                                      pos=(15,350))
         #self.iv = wx.CheckBox(self, label=u'Rückkopplung mit IV Nachfrage',
                                       #id=2,
                                       #pos=(15,375))
@@ -78,28 +78,28 @@ class ParamsDlg(wx.Dialog):
 
         # Open File Buttons
         self.openKenn = wxfb.FileBrowseButton(self, buttonText = u'Öffnen',
-                                              labelText = u'Kenngrößenmatrix:     ',
+                                              labelText = u'ÖV Kenngrößen:          ',
                                               labelWidth = 250,
                                               fileMode=wx.OPEN,
-                                              fileMask='*.h5',
+                                              fileMask='*.h5; *.hdf5',
                                               startDirectory=directory_kenn,
                                               pos=(50,125))
         # Set Value for Open Button -------- Soll in Config Datei ausgeführt werden
-        self.openKenn.SetValue(u'W:\mobil\64 Zwischenablage Nina\Visum_Addins\24.hdf5')
-        self.openStruktur = wxfb.FileBrowseButton(self, buttonText=u'Öffnen',
-                                                  labelText=u'Strukturdaten:              ',
-                                                  labelWidth=250,
-                                                  fileMode=wx.OPEN,
-                                                  fileMask='*.h5',
-                                                  startDirectory=directory_struktur ,
-                                                  pos=(50,155))
         self.openSzenario = wxfb.FileBrowseButton(self, buttonText=u'Öffnen',
                                                   labelText=u'IV Kenngrößen:            ',
                                                   labelWidth=250,
                                                   fileMode=wx.OPEN,
-                                                  fileMask='*.h5',
+                                                  fileMask='*.h5; *.hdf5',
                                                   startDirectory=directory_szenario,
+                                                  pos=(50,155))
+        self.openStruktur = wxfb.FileBrowseButton(self, buttonText=u'Öffnen',
+                                                  labelText=u'Strukturdaten:              ',
+                                                  labelWidth=250,
+                                                  fileMode=wx.OPEN,
+                                                  fileMask='*.h5; *.hdf5',
+                                                  startDirectory=directory_struktur ,
                                                   pos=(50,185))
+
 
 
         """SET Szenario Name and Save"""
@@ -151,7 +151,7 @@ class ParamsDlg(wx.Dialog):
         # Parameter pass to Body
         param = dict()
             # Checkboxen
-        param["hdf5_save"] = self.kcalc.GetValue()
+        ##param["hdf5_save"] = self.kcalc.GetValue()
         param["modelsplit"] = self.modelsplit.GetValue()
         ##param["iv"] = self.iv.GetValue()
             # HDF5 Filepaths

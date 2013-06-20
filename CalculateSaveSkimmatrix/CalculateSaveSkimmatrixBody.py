@@ -49,8 +49,11 @@ def Run(param):
     
     #Set Zeitscheiben - (COM Docu:99)
     Visum.Procedures.OpenXmlWithOptions(r'C:\Users\Barcelona\AppData\Roaming\Visum\125\Addins\zeitscheiben_addin.xml', 0,1)
-    #Import Operation - (COM Docu:99)
-    Visum.Procedures.OpenXmlWithOptions(r'C:\Users\Barcelona\AppData\Roaming\Visum\125\Addins\verfahren3.xml', 1,0,2)
+    #Import Operation ÖV- (COM Docu:99)
+    if param["OVIV"]== "OV": #OperationType 102
+        Visum.Procedures.OpenXmlWithOptions(r'C:\Users\Barcelona\AppData\Roaming\Visum\125\Addins\ov_verfahren.xml', 1,0,2)
+    if param["OVIV"]== "IV": #OperationType 103
+            Visum.Procedures.OpenXmlWithOptions(r'C:\Users\Barcelona\AppData\Roaming\Visum\125\Addins\iv_verfahren.xml', 1,0,2)
     
     # For each i:
     for item in i:
@@ -68,18 +71,13 @@ def Run(param):
         operations = Visum.Procedures.Operations
         op = operations.ItemByKey(1)
         
-        #calculate Skimmatrix
-        ##operations = Visum.Procedures.Operations
-        ##op = operations.AddOperation(1)
-        ##op.SetAttValue('OperationType', 102)
-
-        
         # Set Parameters ->In Tabelle auf S. 113/114 nachschauen
-        put_ckmp = op.PuTCalcSkimMatrixParameters
-        ttp = put_ckmp.TimetableBasedParameters
-        ttbp = ttp.BaseParameters
-        ttbp.SetTimeIntervalStart(start)  # Time in seconds
-        ttbp.SetTimeIntervalEnd(end)    # Time in Seconds
+        if param["OVIV"]== "OV":
+            put_ckmp = op.PuTCalcSkimMatrixParameters
+            ttp = put_ckmp.TimetableBasedParameters
+            ttbp = ttp.BaseParameters
+            ttbp.SetTimeIntervalStart(start)  # Time in seconds
+            ttbp.SetTimeIntervalEnd(end)    # Time in Seconds
         
         #setcurrentOperation
         Visum.Procedures.OperationExecutor.SetCurrentOperation(1)
@@ -108,11 +106,16 @@ def Run(param):
                     root = h.root
                     #Matrix als Numpy array (hat funktion shape)
                     data = VisumPy.helpers.GetMatrix(Visum, no)
-
+                    
+                    #Knoten visum?
+                    try: 
+                        group = h.getNode(root, 'visum')
+                    except NoSuchNodeError:
+                        group = h.createGroup(root,'visum')
                     #addIn.ReportMessage(data)
                     try:
                         # Existiert der Knoten(Tabelle)
-                        table_in_hdf5 = h.getNode(root, name)
+                        table_in_hdf5 = h.getNode(group, name)
 
                     except NoSuchNodeError:
                         # Wenn nicht :
@@ -123,17 +126,26 @@ def Run(param):
                         # if 24 h
                         if item == 5:
                             zeit = 1
-                        arr_shape = (zeit, m_row, m_col)
+                        
+                        if param["OVIV"]== "OV":                        
+                            arr_shape = (zeit, m_row, m_col)
+                        
+                        if param["OVIV"]== "IV":
+                            arr_shape = (m_row, m_col)
+                                         
 
                         #Create Array (here)
                         arr = numpy.zeros(arr_shape, dtype='f4')
 
                         # create Table (in hdf5 file)
                         ##arrname = code+str(t)
-                        table_in_hdf5 = h.createArray(root, name, arr)
+                        table_in_hdf5 = h.createArray(group, name, arr)
 
                     # Fill table with Matrix
-                    if item == 5:
+                    if param["OVIV"]== "IV":
+                        table_in_hdf5[:] = data
+                    
+                    elif item == 5:
                         table_in_hdf5[0] = data
                     else:
                         table_in_hdf5[item] = data

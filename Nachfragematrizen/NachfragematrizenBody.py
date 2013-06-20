@@ -25,7 +25,7 @@ import win32api as win
 
 def Run(param):
     #get parameter
-    h5 = param["hdf5_save"] 
+    ##h5 = param["hdf5_save"] 
     modelsplit = param["modelsplit"] 
     #iv = param["iv"] 
         # HDF5 Filepaths
@@ -36,13 +36,13 @@ def Run(param):
     name = param["Name"] 
     #savepath = param["Savepath"] 
 
-    if param["hdf5_save"]:
+    ##if param["hdf5_save"]:
         # call AddIN Kenngrößen berechnen
-        operations = Visum.Procedures.Operations
-        op = operations.AddOperation(1)
-        op.SetAttValue('OperationType', 84)  # 84 = AddIn aber noch nicht defniert welches???
-        opa = op.AddInParameters
-        opa.SetAttValue('AddInID', 'GGR_CALCSAVESKIM')
+        ##operations = Visum.Procedures.Operations
+        ##op = operations.AddOperation(1)
+        ##op.SetAttValue('OperationType', 84)  # 84 = AddIn aber noch nicht defniert welches???
+        ##opa = op.AddInParameters
+        ##opa.SetAttValue('AddInID', 'GGR_CALCSAVESKIM')
 
 
     # Nachfragemodell aufrufen

@@ -51,20 +51,29 @@ class Example(wx.Dialog):
         #self.label_zeit = wx.StaticText(pnl, -1, (u"(Zeitscheiben müssen als \n"
         #u"Analyseverfahrensparameter \n"
         #u"eingeladen werden)"), pos=(120, 15))
-        self.z1 = wx.CheckBox(pnl, label='0-9', pos=(15, 30))
+        self.z1 = wx.CheckBox(pnl, label='0-9', pos=(150, 30))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z1.GetId())
-        self.z2 = wx.CheckBox(pnl, label='9-12', pos=(15, 45))
+        self.z2 = wx.CheckBox(pnl, label='9-12', pos=(150, 45))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z2.GetId())
-        self.z3 = wx.CheckBox(pnl, label='12-15', pos=(15, 60))
+        self.z3 = wx.CheckBox(pnl, label='12-15', pos=(150, 60))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z3.GetId())
-        self.z4 = wx.CheckBox(pnl, label='15-19', pos=(15, 75))
+        self.z4 = wx.CheckBox(pnl, label='15-19', pos=(150, 75))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z4.GetId())
-        self.z5 = wx.CheckBox(pnl, label='19-24', pos=(15, 90))
+        self.z5 = wx.CheckBox(pnl, label='19-24', pos=(150, 90))
         self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z5.GetId())
         #self.z6 = wx.CheckBox(pnl, label='19-24', pos=(15, 105))
         #self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z6.GetId())
-        self.z24 = wx.CheckBox(pnl, label='0-24', pos=(15, 125))
+        self.z24 = wx.CheckBox(pnl, label='0-24', pos=(150, 125))
         self.Bind(wx.EVT_CHECKBOX, self.enable_16, id=self.z24.GetId())
+        
+        # Combo Box 
+        self.label_2 = wx.StaticText(pnl, -1, _(u'ÖV oder IV:'), pos=(15,15))
+        self.cboOVIV = wx.ComboBox(pnl, -1,
+                                     choices=['OV','IV'],
+                                     size=(100, -1),
+                                     style=wx.CB_DROPDOWN | wx.CB_DROPDOWN,
+                                     pos=(15,35))
+        self.Bind(wx.EVT_COMBOBOX, self.enable_IV, self.cboOVIV)
 
         #Get Projektverzeichniss
         matrix_verzeichnis = 69
@@ -78,6 +87,7 @@ class Example(wx.Dialog):
                                                 fileMask='*.hdf5',
                                                 startDirectory=directory,
                                                 pos=(15, 145))
+
 
         #Statusbar (nur im Frame möglich!)
 ##        self.statusbar = self.CreateStatusBar(7)
@@ -103,7 +113,7 @@ class Example(wx.Dialog):
         closeButton.Bind(wx.EVT_BUTTON, self.On_cancel)
 
         self.SetSize((300, 300))
-        self.SetTitle(r'Kenngrößen berechnen und speichern')
+        self.SetTitle(u'Kenngrößen berechnen und speichern')
         self.Centre()
         self.Show(True)
 
@@ -126,6 +136,7 @@ class Example(wx.Dialog):
         param["Zeitscheibe5"] = self.z5.GetValue()
         #param["Zeitscheibe6"] = self.z6.GetValue()
         param["Zeitscheibe24"] = self.z24.GetValue()
+        param["OVIV"] = str(self.cboOVIV.GetValue())
         param["filepath"] = self.openButton.GetValue()
 
         addInParam.SaveParameter(param)
@@ -166,7 +177,14 @@ class Example(wx.Dialog):
         self.z4.Enable(False)
         self.z5.Enable(False)
         #self.z6.Enable(False)
-
+    def enable_IV(self, evt):
+        if str(self.cboOVIV.GetValue())=="IV":
+            self.z1.Enable(False)
+            self.z2.Enable(False)
+            self.z3.Enable(False)
+            self.z4.Enable(False)
+            self.z5.Enable(False)
+            self.z24.Enable(True)
 
 if len(sys.argv) > 1:
     addIn = AddIn()
