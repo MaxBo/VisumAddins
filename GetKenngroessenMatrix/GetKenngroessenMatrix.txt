@@ -1,0 +1,7 @@
+1.für jede Zeitscheibe:
+Matrix schon da?
+nein -> hinzufügen (Bezeichnung automatisch --> Code aus Zeitscheibe, No aus Set)
+
+
+2.Für jede Zeitscheibe:
+Nachfargematrizen den Ganglinien zuweisen

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <VisumAddInCollection Format="1.0.0">
 		<VisumAddIn>
-			<AddInID>GGR_GETNACHFRAGEMATRIX</AddInID>
-			<AddInName>GetNachfrageMatrix</AddInName>			<!-- todo AddInPath is not used yet -->
+			<AddInID>GGR_GETKENNGROESSENMATRIX</AddInID>
+			<AddInName>GetKenngroessenMatrix</AddInName>			<!-- todo AddInPath is not used yet -->
 			<AddInPath>GGR Matrix</AddInPath>
-			<AddInParaDlgScript>GetNachfrageMatrixDlg.py</AddInParaDlgScript>
-			<AddInBodyScript>GetNachfrageMatrixBody.py</AddInBodyScript>
+			<AddInParaDlgScript>GetKenngroessenMatrixDlg.py</AddInParaDlgScript>
+			<AddInBodyScript>GetkenngroessenMatrixBody.py</AddInBodyScript>
 			<AddInOperation>true</AddInOperation>
 			<AddInAutoMenu>true</AddInAutoMenu>
 			<AddInAutoShowPara>true</AddInAutoShowPara>

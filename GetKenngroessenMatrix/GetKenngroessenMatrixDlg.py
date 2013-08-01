@@ -37,12 +37,11 @@ class getMatrix(wx.Dialog):
         kwds["style"] = wx.CAPTION
         wx.Dialog.__init__(self, *args, **kwds)
         self.SetSize((500,300))
-        self.SetTitle('Nachfragematrizen einlesen')
+        self.SetTitle(u'Kenngrößenmatrizen einlesen')
         self.Centre()
         self.Show(True)
 
-        self.header = wx.StaticText(self, -1, _(u'Nachfragematrix aus Datei in Visum einfügen'), pos=(15,15))
-        self.header = wx.StaticText(self, -1, _(u'Die Zeitscheiben müssen für diese Funktion definiert sein'), pos=(15,30))
+        self.header = wx.StaticText(self, -1, _(u'Kenngrößenmatrix aus Datei in Visum einfügen'), pos=(15,15))
 
         #Get Projektverzeichnis
         matrix_verzeichnis = 69
@@ -52,7 +51,7 @@ class getMatrix(wx.Dialog):
                                                 labelText = u'Matrix öffnen:',
                                                 labelWidth = 0,
                                                 fileMode=wx.OPEN,
-                                                fileMask='*.h5;*.hdf5',
+                                                fileMask='*.h5',
                                                 startDirectory= directory ,
                                                 pos=(15,50))
 
@@ -60,11 +59,11 @@ class getMatrix(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.On_list, self.auswahlButton)
 
 
-        self.ovivText = wx.StaticText(self, -1, _(u'ÖV oder IV:'), pos=(15,105))
+        self.ovivText = wx.StaticText(self, -1, _(u'ÖV oder IV oder NM:'), pos=(15,105))
         self.oviv = wx.ComboBox(self, -1,
-                                choices=('OV', 'IV'),
+                                choices=('OV', 'IV', 'NM'),
                                 style=wx.CB_DROPDOWN | wx.CB_DROPDOWN,
-                                pos=(100,100))
+                                pos=(135,100))
 
 
 
@@ -86,13 +85,25 @@ class getMatrix(wx.Dialog):
         c=[]
         with tables.openFile(filepath, 'r') as f:
             nodes = f.listNodes(f.root) # tables unter root
-            ts = f.root.modes_ts        # group = modes_ts
+            try:
+                group = f.root.iv
+            except: pass
+            try:
+                group = f.root.nmt
+            except: pass
+            try: 
+                group = f.root.put
+            except: pass
+            
+            # f.root.visum:
+                #group.append(f.root.visum)
+            #else: pass
 
-            for node in ts:
+            for node in group:
                 cx = node.name
                 c.append(cx)
 
-        self.tableText = wx.StaticText(self, -1, _(u'Tabelle auswählen:'), pos=(15,150))
+        self.tableText = wx.StaticText(self, -1, _(u'Tabelle auswählen'), pos=(15,150))
         self.cMatrix = wx.ComboBox(self, -1,
                              choices=c,
                              style=wx.CB_DROPDOWN | wx.CB_DROPDOWN,
