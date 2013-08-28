@@ -18,6 +18,7 @@ import VisumPy
 import os
 import sys
 import time
+import subprocess
 #from simcommon.helpers import latinize
 from latinze import latinize
 import VisumPy.AddIn
@@ -46,15 +47,20 @@ def Run(param):
     #File Path from MatrixToHDF5Dlg
     filepath = param['filepath']
     
-    
+    """ZEITSCHEIBEN"""
+    #Addin Path (Com Doku P.62)
+    verzeichnis = 65
+    path = Visum.GetPath(verzeichnis)
+    path_name = str(path)
+    ##addIn.ReportMessage(path)
     #Set Zeitscheiben - (COM Docu:99)
-    Visum.Procedures.OpenXmlWithOptions(r'C:\Users\Barcelona\AppData\Roaming\Visum\125\Addins\zeitscheiben_addin.xml', 0,1)
+    Visum.Procedures.OpenXmlWithOptions(path+'zeitscheiben_addin.xml', 0,1)
     #Import Operation ÖV- (COM Docu:99)
     if param["OVIV"]== "OV": #OperationType 102
-        Visum.Procedures.OpenXmlWithOptions(r'C:\Users\Barcelona\AppData\Roaming\Visum\125\Addins\ov_verfahren.xml', 1,0,2)
+        Visum.Procedures.OpenXmlWithOptions(path+'ov_kassel.xml', 1,0,2)
     if param["OVIV"]== "IV": #OperationType 103
-            Visum.Procedures.OpenXmlWithOptions(r'C:\Users\Barcelona\AppData\Roaming\Visum\125\Addins\iv_verfahren.xml', 1,0,2)
-    
+            Visum.Procedures.OpenXmlWithOptions(path+'iv_verfahren.xml', 1,0,2)
+    """BRECHNENEN"""
     # For each i:
     for item in i:
         #Get start/end Time from Analysezeiträume
@@ -83,7 +89,7 @@ def Run(param):
         Visum.Procedures.OperationExecutor.SetCurrentOperation(1)
         Visum.Procedures.OperationExecutor.ExecuteCurrentOperation()
 
-
+        """SCHREIBEN"""
         # Open File
         with tables.openFile(filepath, 'a') as h:
 
@@ -177,6 +183,21 @@ def Run(param):
                 zonetable = h.createTable(root, 'Bezirke', rec)
 
             h.flush()
+
+    """CALIBREIEREN"""
+    # Nachfragemodell aufrufen
+    ##cmd = r'C:\Anaconda\python C:\Dev\elan\tdm\src\tdm\tdmks\simulation_steps.py'
+    cmd = r'C:\Anaconda\python C:\Dev\elan\tdmks\src\tdmks\main.py'
+    ##cmd = r'C:\Dev\elan\tdmks\run_tdmks.bat'
+    ##cmd_name = '-n %s' %param["Name"]
+    if param["OVIV"]== "OV":
+        pp = '--pp_put'
+    if param["OVIV"]== "IV":
+        pp = '--pp_prt'
+    full_cmd = ' '.join([cmd, pp, '--skip_run'])  ## cmd_zones
+    addIn.ReportMessage(full_cmd)
+    
+    process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE)
 
 
 if len(sys.argv) > 1:

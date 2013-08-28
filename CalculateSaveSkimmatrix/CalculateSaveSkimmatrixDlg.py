@@ -47,7 +47,7 @@ class Example(wx.Dialog):
         vbox = wx.BoxSizer(wx.VERTICAL)
 
         #Radiobuttons
-        self.label_1 = wx.StaticText(pnl, -1, ("Zeitscheibe:"), pos=(15, 15))
+        self.label_1 = wx.StaticText(pnl, -1, ("Zeitscheibe:"), pos=(150, 15))
         #self.label_zeit = wx.StaticText(pnl, -1, (u"(Zeitscheiben müssen als \n"
         #u"Analyseverfahrensparameter \n"
         #u"eingeladen werden)"), pos=(120, 15))
@@ -67,7 +67,7 @@ class Example(wx.Dialog):
         self.Bind(wx.EVT_CHECKBOX, self.enable_16, id=self.z24.GetId())
         
         # Combo Box 
-        self.label_2 = wx.StaticText(pnl, -1, _(u'ÖV oder IV:'), pos=(15,15))
+        self.label_2 = wx.StaticText(pnl, -1, _(u'ÖV oder IV'), pos=(15,15))
         self.cboOVIV = wx.ComboBox(pnl, -1,
                                      choices=['OV','IV'],
                                      size=(100, -1),
@@ -77,14 +77,15 @@ class Example(wx.Dialog):
 
         #Get Projektverzeichniss
         matrix_verzeichnis = 69
-        directory = Visum.GetPath(matrix_verzeichnis)
+        ##directory = Visum.GetPath(matrix_verzeichnis)
+        directory = r'W:\mobil\01 Projekte\1008 VEP Kassel\50 Modellaufbau\80 Nachfragedaten\kassel\matrices'
 
         self.openButton = wxfb.FileBrowseButton(pnl,
                                                 buttonText='Speichern unter',
                                                 labelText='',
                                                 labelWidth=0,
                                                 fileMode=wx.SAVE,
-                                                fileMask='*.hdf5',
+                                                fileMask='*.h5',
                                                 startDirectory=directory,
                                                 pos=(15, 145))
 

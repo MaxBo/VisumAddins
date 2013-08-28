@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <VisumAddInCollection Format="1.0.0">
 		<VisumAddIn>
-			<AddInID>GGR_DEMAND</AddInID>
-			<AddInName>Nachfragemodellberechnen</AddInName>			<!-- todo AddInPath is not used yet -->
+			<AddInID>SaveDemandMatrix</AddInID>
+			<AddInName>SaveNachfrageMatrix</AddInName>			<!-- todo AddInPath is not used yet -->
 			<AddInPath>GGR Matrix</AddInPath>
-			<AddInParaDlgScript>NachfragematrizenDlg.py</AddInParaDlgScript>
-			<AddInBodyScript>NachfragematrizenBody.py</AddInBodyScript>
+			<AddInParaDlgScript>SaveDemandMatrixDlg.py</AddInParaDlgScript>
+			<AddInBodyScript>SaveDemandMatrixBody.py</AddInBodyScript>
 			<AddInOperation>true</AddInOperation>
 			<AddInAutoMenu>true</AddInAutoMenu>
 			<AddInAutoShowPara>true</AddInAutoShowPara>
