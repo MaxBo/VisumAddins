@@ -20,8 +20,10 @@ import VisumPy.AddIn
 from VisumPy.helpers import GetMatrix , SetMatrix, GetMulti, __getMatrixByCode
 
 from tables.exceptions import NoSuchNodeError
-import h5py
+
 from VisumPy.matrices import fromNumArray
+from expand_array import expand_array
+
 
 #zeit = {0:'0006', 1:'0608', 2:'0812', 3:'1215', 4:'1519', 5:'1924'}
 
@@ -53,6 +55,10 @@ def Run(param):
             zeit.append(ti.AttValue('Code'))
 
     codes = GetMulti(Visum.Net.Matrices, 'Code')
+
+    zones_visum = Visum.Net.Zones.GetAll
+    zones_no_visum = numpy.array(GetMulti(Visum.Net.Zones, 'No')).astype('i4')
+
     # Does Matrix exist?
     for z, code in enumerate(zeit):
         #ovcode = 'OV%s' %code.encode("iso-8859-15")
@@ -69,11 +75,20 @@ def Run(param):
 
         # Fill Matrix
         with tables.openFile(filepath, 'r') as h:
+            # zone definition in the hdf5-file
+            zones_in_hdf5 = h.getNode(h.root, 'zones')
+            zones_h5 = zones_in_hdf5.col('zone_no')
             try:
                 table_in_hdf5 = h.getNode(h.root.modes_ts, tablename)
-                zones = Visum.Net.Zones.GetAll
                 tt = table_in_hdf5[z]
-                f = fromNumArray(tt, zones)
+                # expand array to VISUM zone definition
+
+                tt_expanded = expand_array(arr=tt,
+                                           arr_zones=zones_h5, 
+                                           zone_no=zones_no_visum,
+                                           fill_value=0)
+                # set Matrix
+                f = fromNumArray(tt_expanded, zones_visum)
                 values = f['datavalues']
                 SetMatrix(Visum, ovcode, values)
 
