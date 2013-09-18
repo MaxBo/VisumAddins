@@ -24,9 +24,6 @@ from tables.exceptions import NoSuchNodeError
 from VisumPy.matrices import fromNumArray
 from expand_array import expand_array
 
-
-#zeit = {0:'0006', 1:'0608', 2:'0812', 3:'1215', 4:'1519', 5:'1924'}
-
 def Run(param):
     filepath = param['filepath']
     tablename = param['table']
@@ -48,11 +45,15 @@ def Run(param):
     at = f.AnalysisTimes
 
     zeit = []
+    aggregate = []
 
     for t in xrange(at.NumTimeIntervals):
         ti = at.TimeInterval(t+1)
-        if not ti.AttValue('IsAggregate'):
-            zeit.append(ti.AttValue('Code'))
+        ##if not ti.AttValue('IsAggregate'):
+        zeit.append(ti)
+        ##if ti.AttValue('IsAggregate'):
+            ##aggregate.append(ti.AttValue('Code'))
+    
 
     codes = GetMulti(Visum.Net.Matrices, 'Code')
 
@@ -60,7 +61,8 @@ def Run(param):
     zones_no_visum = numpy.array(GetMulti(Visum.Net.Zones, 'No')).astype('i4')
 
     # Does Matrix exist?
-    for z, code in enumerate(zeit):
+    for z, ti in enumerate(zeit):
+        code = ti.AttValue('Code')
         #ovcode = 'OV%s' %code.encode("iso-8859-15")
         ovcode = v+code.encode("iso-8859-15")
         if not ovcode in codes:
@@ -79,10 +81,16 @@ def Run(param):
             zones_in_hdf5 = h.getNode(h.root, 'zones')
             zones_h5 = zones_in_hdf5.col('zone_no')
             try:
-                table_in_hdf5 = h.getNode(h.root.modes_ts, tablename)
-                tt = table_in_hdf5[z]
+                if not ti.AttValue('IsAggregate'):
+                    table_in_hdf5 = h.getNode(h.root.modes_ts, tablename)
+                    tt = table_in_hdf5[z]
+                
+                # für aggregate 24h
+                else:
+                    table_in_hdf5 = h.getNode(h.root.modes, tablename)
+                    tt = table_in_hdf5[:]
+                    
                 # expand array to VISUM zone definition
-
                 tt_expanded = expand_array(arr=tt,
                                            arr_zones=zones_h5, 
                                            zone_no=zones_no_visum,
@@ -94,6 +102,8 @@ def Run(param):
 
             except IndexError:
                 pass
+
+
 
     # Ganglinien
     tsc = Visum.Net.TimeSeriesCont.GetAll

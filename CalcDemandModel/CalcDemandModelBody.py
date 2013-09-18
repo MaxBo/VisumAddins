@@ -49,17 +49,17 @@ def Run(param):
     cmd = r'C:\Anaconda\python C:\Dev\elan\tdmks\src\tdmks\main.py'
     ##cmd = r'C:\Dev\elan\tdmks\run_tdmks.bat'
     cmd_name = '-n %s' %param["Name"]
-    #cmd_zonal = '--zd %s' %param["Struktur"]
+    cmd_zonal = '--zd %s' %param["Struktur"]
     cmd_put = '--put %s' %param["PUT"]
     cmd_prt = '--prt %s' %param["PRT"]
     cmd_nmt = '--nmt %s' %param["NMT"]
-    #cmd_par = '--par %s' % r'W:\mobil\01 Projekte\1008 VEP Kassel\50 Modellaufbau\80 Nachfragedaten\kassel\params\params.h5'
-    cmd_zones = '--pp_zones %s' % r'params.s3db'
+    cmd_par = '--par %s' % r'params130902_1.h5'
+    #cmd_par = '--par %s' % r'params.h5'
     if param['modelsplit']:
         cmd_cal = '-c'
     else:cmd_cal=''
     
-    full_cmd = ' '.join([cmd, cmd_name, cmd_put, cmd_prt, cmd_nmt, cmd_cal])  ## cmd_zones
+    full_cmd = ' '.join([cmd, cmd_name, cmd_put, cmd_prt, cmd_nmt, cmd_zonal, cmd_par, cmd_cal])  ## cmd_zones
     win.MessageBox(0, full_cmd)
     
     process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE)

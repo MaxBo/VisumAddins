@@ -2,7 +2,7 @@
 <VisumAddInCollection Format="1.0.0">
 		<VisumAddIn>
 			<AddInID>GGR_CALCDEMAND</AddInID>
-			<AddInName>CalcDemandModel</AddInName>			<!-- todo AddInPath is not used yet -->
+			<AddInName>CalcSaveDemandModel</AddInName>			<!-- todo AddInPath is not used yet -->
 			<AddInPath>GGR Matrix</AddInPath>
 			<AddInParaDlgScript>CalcDemandModelDlg.py</AddInParaDlgScript>
 			<AddInBodyScript>CalcDemandModelBody.py</AddInBodyScript>

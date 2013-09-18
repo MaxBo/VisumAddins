@@ -18,6 +18,7 @@
 ###############################################################################
 import wx
 import os
+from os import path
 import sys
 import VisumPy
 from VisumPy.wxHelpers import wxNetobjCombo, wxAttrIDButton
@@ -56,8 +57,9 @@ class ParamsDlg(wx.Dialog):
         # Combo Box Config Files
         """Get *.py from Combobox and execute *.py"""
         self.label_conf = wx.StaticText(self, -1, _('Konfiguration:'), pos=(15,50))
-        choices = os.listdir(r'C:\Users\Public\Documents\VisumAddInTest')
-        e_files = [f for f in choices if f.startswith('e')]
+        configpath = r"\Visum\125\Addins\demandConfig"
+        choices = os.listdir(os.getenv('APPDATA')+configpath)
+        e_files = [f for f in choices]
         self.cboMatrix = wx.ComboBox(self, -1,
                                      choices=e_files,
                                      size=(175, -1),

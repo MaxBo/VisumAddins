@@ -59,7 +59,7 @@ def Run(param):
     if param["OVIV"]== "OV": #OperationType 102
         Visum.Procedures.OpenXmlWithOptions(path+'ov_kassel.xml', 1,0,2)
     if param["OVIV"]== "IV": #OperationType 103
-            Visum.Procedures.OpenXmlWithOptions(path+'iv_verfahren.xml', 1,0,2)
+            Visum.Procedures.OpenXmlWithOptions(path+'iv_kassel.xml', 1,0,2)
     """BRECHNENEN"""
     # For each i:
     for item in i:
@@ -69,6 +69,8 @@ def Run(param):
         a = at.TimeInterval(item + 1)  # auswahl Zeitintervall
         start = a.AttValue('StartTime')
         end = a.AttValue('EndTime')
+        if item == 4:
+            end = 3600*24-1
         if item == 5:
             start = 0
             end = 3600*24-1
@@ -105,7 +107,20 @@ def Run(param):
 
                     #Create/Open HDF5
                     name = latinize(m.AttValue('Name'))
-                    #name = m.AttValue('Name') # da latinize nur
+                    if name == 'Fahrtweite-VSys(AST)':
+                        name = 'in_vehicle_distance_ast'
+                    if name == 'Fahrtweite-VSys(Bus)':
+                        name = 'in_vehicle_distance_bus'
+                    if name == 'Fahrzeit im Fahrzeug-VSys(AST)':
+                        name = 'in_vehicle_time_ast'
+                    if name == 'Fahrzeit im Fahrzeug-VSys(Bus)':
+                        name = 'in_vehicle_time_bus'
+                    if name == 'Fahrtweite':
+                        name = 'Fahrweite'
+                    if name == 'Gehzeit':
+                        name = 'Umsteigegehzeit'
+                    if name == 'Fahrzeit im Fahrzeug':
+                        name = 'FahrzeitimFahrzeug'
                     code = m.AttValue('Code')
                     no = m.AttValue('No')
 
@@ -192,12 +207,22 @@ def Run(param):
     ##cmd_name = '-n %s' %param["Name"]
     if param["OVIV"]== "OV":
         pp = '--pp_put'
+        p = '--put %s' %param["filepath"].split('\\')[-1]
     if param["OVIV"]== "IV":
         pp = '--pp_prt'
-    full_cmd = ' '.join([cmd, pp, '--skip_run'])  ## cmd_zones
+        p = '--prt %s' %param["filepath"].split('\\')[-1]
+    full_cmd = ' '.join([cmd, p, pp, '--skip_run'])  ## cmd_zones
     addIn.ReportMessage(full_cmd)
     
     process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE)
+
+    returnvalue = process.wait()
+    if returnvalue == 1:
+        addIn.ReportMessage('Fehler')
+    if returnvalue == 0:
+        addIn.ReportMessage('Fertig')
+
+    #Close command line??
 
 
 if len(sys.argv) > 1:
