@@ -201,10 +201,7 @@ def Run(param):
 
     """CALIBREIEREN"""
     # Nachfragemodell aufrufen
-    ##cmd = r'C:\Anaconda\python C:\Dev\elan\tdm\src\tdm\tdmks\simulation_steps.py'
-    cmd = r'C:\Anaconda\python C:\Dev\elan\tdmks\src\tdmks\main.py'
-    ##cmd = r'C:\Dev\elan\tdmks\run_tdmks.bat'
-    ##cmd_name = '-n %s' %param["Name"]
+    cmd = r'C:\Anaconda\python C:\Anaconda\Lib\site-packages\tdmks\main.py'
     if param["OVIV"]== "OV":
         pp = '--pp_put'
         p = '--put %s' %param["filepath"].split('\\')[-1]

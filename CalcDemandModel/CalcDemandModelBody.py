@@ -47,13 +47,13 @@ def Run(param):
     # Nachfragemodell aufrufen
     ##cmd = r'C:\Anaconda\python C:\Dev\elan\tdm\src\tdm\tdmks\simulation_steps.py'
     cmd = r'C:\Anaconda\python C:\Dev\elan\tdmks\src\tdmks\main.py'
-    ##cmd = r'C:\Dev\elan\tdmks\run_tdmks.bat'
+    cmd = r'C:\Anaconda\python C:\Anaconda\Lib\site-packages\tdmks\main.py'
     cmd_name = '-n %s' %param["Name"]
     cmd_zonal = '--zd %s' %param["Struktur"]
     cmd_put = '--put %s' %param["PUT"]
     cmd_prt = '--prt %s' %param["PRT"]
     cmd_nmt = '--nmt %s' %param["NMT"]
-    cmd_par = '--par %s' % r'params130902_1.h5'
+    cmd_par = '--par %s' % r'params.h5'
     #cmd_par = '--par %s' % r'params.h5'
     if param['modelsplit']:
         cmd_cal = '-c'

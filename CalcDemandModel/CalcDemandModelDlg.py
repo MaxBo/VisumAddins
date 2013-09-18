@@ -27,9 +27,12 @@ import VisumPy.helpers as helpers
 import wx.lib.filebrowsebutton as wxfb
 import win32api as win
 
+configpath = r"\Visum\125\Addins\demandConfig"
+
 def matrixFormatter(no, code):
     return "%d | %s" % (no, code)
 
+	
 class ParamsDlg(wx.Dialog):
 
     def __init__(self, *args, **kwds):
@@ -57,7 +60,6 @@ class ParamsDlg(wx.Dialog):
         # Combo Box Config Files
         """Get *.py from Combobox and execute *.py"""
         self.label_conf = wx.StaticText(self, -1, _('Konfiguration:'), pos=(15,50))
-        configpath = r"\Visum\125\Addins\demandConfig"
         choices = os.listdir(os.getenv('APPDATA')+configpath)
         e_files = [f for f in choices]
         self.cboMatrix = wx.ComboBox(self, -1,
@@ -130,7 +132,7 @@ class ParamsDlg(wx.Dialog):
 
     def On_CONF(self, event):
         # execute configuration
-        directory = r'C:/Users/Public/Documents/VisumAddInTest'
+        directory = os.path.join(os.getenv('APPDATA')+configpath)
         config = self.cboMatrix.GetValue()
         conf_path = directory + '/' + config
         execfile(conf_path)
@@ -138,7 +140,7 @@ class ParamsDlg(wx.Dialog):
     def On_NAME(self, event):
         name = self.name1.GetValue()
         #win.MessageBox(0, name)
-        directory = r'C:/Users/Public/Documents/VisumAddInTest/'
+        directory = os.path.join(os.getenv('APPDATA')+configpath)
         self.saveButton.SetValue(directory+name+'.h5')
         
 
