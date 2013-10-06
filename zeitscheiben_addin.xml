@@ -1,0 +1,77 @@
+<?xml  version = "1.0"  encoding = "UTF-8"?>
+<PROCEDURES  VERSION = "7">
+  <FUNCTIONS>
+    <ANALYSISTIMES
+      USEONPUTRESULTS = "1"
+      USEONPRTRESULTS = "1"
+      STARTDAYINDEX = "1"
+      ENDDAYINDEX = "1"
+    />    
+    <ANALYSISTIMEINTERVAL
+      CODE = "0009"
+      NAME = "0h-9h"
+      ISAGGREGATE = "0"
+      DERIVEDFROM = ""
+      AGGRFUNCTION = "MEAN"
+      STARTDAYINDEX = "1"
+      STARTTIME = "00:00:00"
+      ENDDAYINDEX = "1"
+      ENDTIME = "09:00:00"
+    />    
+    <ANALYSISTIMEINTERVAL
+      CODE = "0912"
+      NAME = "9h-12h"
+      ISAGGREGATE = "0"
+      DERIVEDFROM = ""
+      AGGRFUNCTION = "MEAN"
+      STARTDAYINDEX = "1"
+      STARTTIME = "09:00:00"
+      ENDDAYINDEX = "1"
+      ENDTIME = "12:00:00"
+    />    
+    <ANALYSISTIMEINTERVAL
+      CODE = "1215"
+      NAME = "12h-15h"
+      ISAGGREGATE = "0"
+      DERIVEDFROM = ""
+      AGGRFUNCTION = "MEAN"
+      STARTDAYINDEX = "1"
+      STARTTIME = "12:00:00"
+      ENDDAYINDEX = "1"
+      ENDTIME = "15:00:00"
+    />    
+    <ANALYSISTIMEINTERVAL
+      CODE = "1519"
+      NAME = "15h-19h"
+      ISAGGREGATE = "0"
+      DERIVEDFROM = ""
+      AGGRFUNCTION = "MEAN"
+      STARTDAYINDEX = "1"
+      STARTTIME = "15:00:00"
+      ENDDAYINDEX = "1"
+      ENDTIME = "19:00:00"
+    />    
+    <ANALYSISTIMEINTERVAL
+      CODE = "1924"
+      NAME = "19h-24h"
+      ISAGGREGATE = "0"
+      DERIVEDFROM = ""
+      AGGRFUNCTION = "MEAN"
+      STARTDAYINDEX = "1"
+      STARTTIME = "19:00:00"
+      ENDDAYINDEX = "1"
+      ENDTIME = "23:59:59"
+    />    
+    <ANALYSISTIMEINTERVAL
+      CODE = "0024"
+      NAME = "0-24"
+      ISAGGREGATE = "1"
+      DERIVEDFROM = "0009,0912,1215,1519,1924"
+      AGGRFUNCTION = "SUM"
+      STARTDAYINDEX = "1"
+      STARTTIME = "00:00:00"
+      ENDDAYINDEX = "1"
+      ENDTIME = "23:59:59"
+    />    
+  </FUNCTIONS>
+</PROCEDURES>

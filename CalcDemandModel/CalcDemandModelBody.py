@@ -50,7 +50,7 @@ def Run(param):
     cmd = r'C:\Anaconda\python C:\Anaconda\Lib\site-packages\tdmks\main.py'
     cmd_name = '-n %s' %param["Name"]
     cmd_zonal = '--zd %s' %param["Struktur"]
-    cmd_put = '--put %s' %param["PUT"]
+    cmd_put = '--pp_put --put %s' %param["PUT"]
     cmd_prt = '--prt %s' %param["PRT"]
     cmd_nmt = '--nmt %s' %param["NMT"]
     cmd_par = '--par %s' % r'params.h5'

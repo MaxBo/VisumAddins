@@ -186,16 +186,18 @@ def Run(param):
             # Tabelle Bezirke
             try:
                 zonetable = h.getNode(h.root.Bezirke)
+                zonetable.remove()
             except NoSuchNodeError:
-                zones = Visum.Net.Zones
-                nummer = numpy.array(VisumPy.helpers.GetMulti(zones, 'No'))
-                name = numpy.array(VisumPy.helpers.GetMulti(zones, 'Name')).view(numpy.chararray).encode('cp1252')
-                rec = numpy.rec.fromarrays([nummer, name],
-                                           names=['zone_no',
-                                                  'zone_name'],
-                                           titles=['Bezirke', 'BezirksNamen'],
-                                           formats=['<i4', 'S255'])
-                zonetable = h.createTable(root, 'Bezirke', rec)
+                pass
+            zones = Visum.Net.Zones
+            nummer = numpy.array(VisumPy.helpers.GetMulti(zones, 'No'))
+            name = numpy.array(VisumPy.helpers.GetMulti(zones, 'Name')).view(numpy.chararray).encode('cp1252')
+            rec = numpy.rec.fromarrays([nummer, name],
+                                       names=['zone_no',
+                                      'zone_name'],
+                                       titles=['Bezirke', 'BezirksNamen'],
+                                       formats=['<i4', 'S255'])
+            zonetable = h.createTable(root, 'Bezirke', rec)
 
             h.flush()
 
