@@ -9,7 +9,8 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-
-self.openKenn.SetValue(r'C:\Users\Barcelona\tdm\kassel\matrices\SkimsPuT.h5')
-self.openStruktur.SetValue(r'C:\Users\Barcelona\tdm\kassel\params\zonal_data.h5')
-self.openSzenario.SetValue(r'C:\Users\Barcelona\tdm\kassel\matrices\SkimsPrT.h5')
+self.openPut.SetValue('test_NF2010_FZK.h5')
+self.openPrt.SetValue('test.h5')
+self.openNmt.SetValue('SkimsNmT.h5')
+self.openStruktur.SetValue('zonal_2010.h5')
+self.openParams.SetValue('params.h5')

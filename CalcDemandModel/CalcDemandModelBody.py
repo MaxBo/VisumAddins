@@ -24,49 +24,41 @@ from tables.exceptions import NoSuchNodeError
 import win32api as win
 
 def Run(param):
-    #get parameter
-
-    modelsplit = param["modelsplit"] 
-        # HDF5 Filepaths
-    put = param["PUT"]
-    prt = param["PRT"]
-    nmt = param["NMT"] 
-    struktur = param["Struktur"] 
-        # Speichern
-    name = param["Name"] 
-
-    ##if param["hdf5_save"]:
-        # call AddIN Kenngrößen berechnen
-        ##operations = Visum.Procedures.Operations
-        ##op = operations.AddOperation(1)
-        ##op.SetAttValue('OperationType', 84)  # 84 = AddIn aber noch nicht defniert welches???
-        ##opa = op.AddInParameters
-        ##opa.SetAttValue('AddInID', 'GGR_CALCSAVESKIM')
-
 
     # Nachfragemodell aufrufen
-    ##cmd = r'C:\Anaconda\python C:\Dev\elan\tdm\src\tdm\tdmks\simulation_steps.py'
-    cmd = r'C:\Anaconda\python C:\Dev\elan\tdmks\src\tdmks\main.py'
-    cmd = r'C:\Anaconda\python C:\Anaconda\Lib\site-packages\tdmks\main.py'
-    cmd_name = '-n %s' %param["Name"]
-    cmd_zonal = '--zd %s' %param["Struktur"]
-    cmd_put = '--pp_put --put %s' %param["PUT"]
-    cmd_prt = '--prt %s' %param["PRT"]
-    cmd_nmt = '--nmt %s' %param["NMT"]
-    cmd_par = '--par %s' % r'params.h5'
-    #cmd_par = '--par %s' % r'params.h5'
-    if param['modelsplit']:
+    # call module -m tdmks.main instead of fixed path to .py-file
+    cmd = r'C:\Anaconda\python -m tdmks.main'
+
+    cmd_name = '-n %s' % param["Name"]
+    cmd_zonal = '--zd %s' % param["Struktur"]
+    cmd_put = '--pp_put --put %s' % param["PUT"]
+    cmd_prt = '--pp_prt --prt %s' % param["PRT"]
+    cmd_nmt = '--nmt %s' % param["NMT"]
+    cmd_par = '--par %s' % param["Parameter"]
+
+    if param['modal_split']:
         cmd_cal = '-c'
     else:cmd_cal=''
-    
-    full_cmd = ' '.join([cmd, cmd_name, cmd_put, cmd_prt, cmd_nmt, cmd_zonal, cmd_par, cmd_cal])  ## cmd_zones
-    win.MessageBox(0, full_cmd)
-    
+
+
+    # create full command
+    full_cmd = ' '.join([cmd, cmd_name, cmd_put, cmd_prt,
+                         cmd_nmt, cmd_zonal, cmd_par, cmd_cal])
+
+    # double check if really should run with Message box
+    title = 'Starte Nachfragemodell mit folgendem Kommando'
+    OK_CANCEL = 1
+    result = win.MessageBox(0, full_cmd, title, OK_CANCEL)
+    # Cancel selected
+    if result == 2:
+        addIn.ReportMessage('Abbruch')
+        return
+
     process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE)
     message = process.stdout.readline()
     group = None
     while len(message) > 0:
-        #addIn.ReportMessage(message)     
+        #addIn.ReportMessage(message)
         l = message.split("INFO->['")
         if len(l)>1:
             l2 = l[1].split("'")
@@ -80,15 +72,15 @@ def Run(param):
                     addIn.CloseProgressDialog()
                 except:
                     pass
-                addIn.ShowProgressDialog('Ziel und Verkehrmittelwahl',"Gruppe %s" %group,
-                                         progressMax)
+                msg = 'Ziel und Verkehrmittelwahl'
+                addIn.ShowProgressDialog(msg, "Gruppe %s" % group, progressMax)
             already_done = progressMax - to_do
-            #addIn.ReportMessage('%s %s' %(group, to_do))
+
             addIn.UpdateProgressDialog(already_done)
         message = process.stdout.readline()
-             
+
     #addIn.ReportMessage(message)
-        
+
     returnvalue = process.wait()
     if returnvalue == 1:
         addIn.ReportMessage('Fehler')
