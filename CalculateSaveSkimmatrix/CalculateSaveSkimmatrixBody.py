@@ -46,7 +46,7 @@ def Run(param):
 
     #File Path from MatrixToHDF5Dlg
     filepath = param['filepath']
-    
+
     """ZEITSCHEIBEN"""
     #Addin Path (Com Doku P.62)
     verzeichnis = 65
@@ -74,11 +74,11 @@ def Run(param):
         if item == 5:
             start = 0
             end = 3600*24-1
-            
+
         #Get Operation
         operations = Visum.Procedures.Operations
         op = operations.ItemByKey(1)
-        
+
         # Set Parameters ->In Tabelle auf S. 113/114 nachschauen
         if param["OVIV"]== "OV":
             put_ckmp = op.PuTCalcSkimMatrixParameters
@@ -86,7 +86,7 @@ def Run(param):
             ttbp = ttp.BaseParameters
             ttbp.SetTimeIntervalStart(start)  # Time in seconds
             ttbp.SetTimeIntervalEnd(end)    # Time in Seconds
-        
+
         #setcurrentOperation
         Visum.Procedures.OperationExecutor.SetCurrentOperation(1)
         Visum.Procedures.OperationExecutor.ExecuteCurrentOperation()
@@ -127,9 +127,9 @@ def Run(param):
                     root = h.root
                     #Matrix als Numpy array (hat funktion shape)
                     data = VisumPy.helpers.GetMatrix(Visum, no)
-                    
+
                     #Knoten visum?
-                    try: 
+                    try:
                         group = h.getNode(root, 'visum')
                     except NoSuchNodeError:
                         group = h.createGroup(root,'visum')
@@ -147,13 +147,13 @@ def Run(param):
                         # if 24 h
                         if item == 5:
                             zeit = 1
-                        
-                        if param["OVIV"]== "OV":                        
+
+                        if param["OVIV"]== "OV":
                             arr_shape = (zeit, m_row, m_col)
-                        
+
                         if param["OVIV"]== "IV":
                             arr_shape = (m_row, m_col)
-                                         
+
 
                         #Create Array (here)
                         arr = numpy.zeros(arr_shape, dtype='f4')
@@ -165,7 +165,7 @@ def Run(param):
                     # Fill table with Matrix
                     if param["OVIV"]== "IV":
                         table_in_hdf5[:] = data
-                    
+
                     elif item == 5:
                         table_in_hdf5[0] = data
                     else:
@@ -201,25 +201,25 @@ def Run(param):
 
             h.flush()
 
-    """CALIBREIEREN"""
-    # Nachfragemodell aufrufen
-    cmd = r'C:\Anaconda\python C:\Anaconda\Lib\site-packages\tdmks\main.py'
-    if param["OVIV"]== "OV":
-        pp = '--pp_put'
-        p = '--put %s' %param["filepath"].split('\\')[-1]
-    if param["OVIV"]== "IV":
-        pp = '--pp_prt'
-        p = '--prt %s' %param["filepath"].split('\\')[-1]
-    full_cmd = ' '.join([cmd, p, pp, '--skip_run'])  ## cmd_zones
-    addIn.ReportMessage(full_cmd)
-    
-    process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE)
+    #"""CALIBREIEREN"""
+    ## Nachfragemodell aufrufen
+    #cmd = r'C:\Anaconda\python -m tdmks.main'
+    #if param["OVIV"]== "OV":
+        #pp = ''  # '--pp_put'
+        #p = '--put %s' %param["filepath"].split('\\')[-1]
+    #if param["OVIV"]== "IV":
+        #pp = ''  # '--pp_prt'
+        #p = '--prt %s' %param["filepath"].split('\\')[-1]
+    #full_cmd = ' '.join([cmd, p, pp, '--skip_run'])  ## cmd_zones
+    #addIn.ReportMessage(full_cmd)
 
-    returnvalue = process.wait()
-    if returnvalue == 1:
-        addIn.ReportMessage('Fehler')
-    if returnvalue == 0:
-        addIn.ReportMessage('Fertig')
+    #process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE)
+
+    #returnvalue = process.wait()
+    #if returnvalue == 1:
+        #addIn.ReportMessage('Fehler')
+    #if returnvalue == 0:
+        #addIn.ReportMessage('Fertig')
 
     #Close command line??
 

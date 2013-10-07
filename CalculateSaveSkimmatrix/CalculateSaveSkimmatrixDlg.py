@@ -25,6 +25,9 @@ from VisumPy.AddIn import AddIn, AddInState, AddInParameter
 import VisumPy.helpers as helpers
 import wx.lib.filebrowsebutton as wxfb
 
+addin_path = os.path.join(os.getenv('APPDATA'), 'Visum', '125', 'Addins')
+configpath = os.path.join(addin_path, 'demandConfig')
+
 
 class Example(wx.Dialog):
 
@@ -65,8 +68,8 @@ class Example(wx.Dialog):
         #self.Bind(wx.EVT_CHECKBOX, self.enable_24, id=self.z6.GetId())
         self.z24 = wx.CheckBox(pnl, label='0-24', pos=(150, 125))
         self.Bind(wx.EVT_CHECKBOX, self.enable_16, id=self.z24.GetId())
-        
-        # Combo Box 
+
+        # Combo Box
         self.label_2 = wx.StaticText(pnl, -1, _(u'ÖV oder IV'), pos=(15,15))
         self.cboOVIV = wx.ComboBox(pnl, -1,
                                      choices=['OV','IV'],
@@ -77,8 +80,18 @@ class Example(wx.Dialog):
 
         #Get Projektverzeichniss
         matrix_verzeichnis = 69
+
+        # Directories
+        # Hardcoding raus!!!
+        try:
+            fn = os.path.join(configpath, 'project_folder.txt')
+            with open(fn) as f:
+                self.base_path = f.readline().strip()
+        except IOError:
+            self.base_path = r'W:\mobil\01 Projekte\1008 VEP Kassel\50 Modellaufbau\80 Nachfragedaten\kassel'
+
         ##directory = Visum.GetPath(matrix_verzeichnis)
-        directory = r'W:\mobil\01 Projekte\1008 VEP Kassel\50 Modellaufbau\80 Nachfragedaten\kassel\matrices'
+        self.directory = os.path.join(self.base_path, 'matrices', 'skims_put')
 
         self.openButton = wxfb.FileBrowseButton(pnl,
                                                 buttonText='Speichern unter',
@@ -86,7 +99,7 @@ class Example(wx.Dialog):
                                                 labelWidth=0,
                                                 fileMode=wx.SAVE,
                                                 fileMask='*.h5',
-                                                startDirectory=directory,
+                                                startDirectory=self.directory,
                                                 pos=(15, 145))
 
 
@@ -178,6 +191,7 @@ class Example(wx.Dialog):
         self.z4.Enable(False)
         self.z5.Enable(False)
         #self.z6.Enable(False)
+
     def enable_IV(self, evt):
         if str(self.cboOVIV.GetValue())=="IV":
             self.z1.Enable(False)
@@ -186,6 +200,17 @@ class Example(wx.Dialog):
             self.z4.Enable(False)
             self.z5.Enable(False)
             self.z24.Enable(True)
+            self.directory = os.path.join(self.base_path, 'matrices', 'skims_prt')
+        else:
+            self.z1.Enable(True)
+            self.z2.Enable(True)
+            self.z3.Enable(True)
+            self.z4.Enable(True)
+            self.z5.Enable(True)
+            self.z24.Enable(True)
+            self.directory = os.path.join(self.base_path, 'matrices', 'skims_put')
+        self.openButton.startDirectory = self.directory
+
 
 if len(sys.argv) > 1:
     addIn = AddIn()

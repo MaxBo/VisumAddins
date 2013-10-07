@@ -210,7 +210,6 @@ if len(sys.argv) > 1:
 else:
     addIn = AddIn(Visum) # Erzeuge Visum Objekt
 
-
 if addIn.IsInDebugMode:
     app = wx.PySimpleApp(0)
     Visum = addIn.VISUM
