@@ -8,7 +8,7 @@
       ACTIVE = "1"
       COMMENT = "">
       <PRTSKIMMATRIXPARA
-        DSEG = ""
+        DSEG = "PKW_PRIV"
         FILENAME = ""
         VISEMMODE = "4"
         CONFIRMOVERWRITE = "1"

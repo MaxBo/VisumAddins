@@ -197,7 +197,7 @@ def Run(param):
                                       'zone_name'],
                                        titles=['Bezirke', 'BezirksNamen'],
                                        formats=['<i4', 'S255'])
-            zonetable = h.createTable(root, 'Bezirke', rec)
+            zonetable = h.createTable(h.root, 'Bezirke', rec)
 
             h.flush()
 
