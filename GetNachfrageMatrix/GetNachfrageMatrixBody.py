@@ -53,7 +53,7 @@ def Run(param):
         zeit.append(ti)
         ##if ti.AttValue('IsAggregate'):
             ##aggregate.append(ti.AttValue('Code'))
-    
+
 
     codes = GetMulti(Visum.Net.Matrices, 'Code')
 
@@ -82,17 +82,30 @@ def Run(param):
             zones_h5 = zones_in_hdf5.col('zone_no')
             try:
                 if not ti.AttValue('IsAggregate'):
-                    table_in_hdf5 = h.getNode(h.root.modes_ts, tablename)
-                    tt = table_in_hdf5[z]
-                
+                    if tablename != 'all':
+                        table_in_hdf5 = h.getNode(h.root.modes_ts, tablename)
+                        tt = table_in_hdf5[z]
+                    else:
+                        tt = 0
+                        ts = h.root.modes_ts
+                        for table_in_hdf5 in ts:
+                            tt += table_in_hdf5[z]
+
                 # für aggregate 24h
                 else:
-                    table_in_hdf5 = h.getNode(h.root.modes, tablename)
-                    tt = table_in_hdf5[:]
-                    
+                    if tablename != 'all':
+                        table_in_hdf5 = h.getNode(h.root.modes, tablename)
+                        tt = table_in_hdf5[:]
+                    else:
+                        tt = 0
+                        all_trips = h.root.modes
+                        for table_in_hdf5 in all_trips:
+                            tt += table_in_hdf5[:]
+
+
                 # expand array to VISUM zone definition
                 tt_expanded = expand_array(arr=tt,
-                                           arr_zones=zones_h5, 
+                                           arr_zones=zones_h5,
                                            zone_no=zones_no_visum,
                                            fill_value=0)
                 # set Matrix

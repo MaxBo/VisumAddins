@@ -26,11 +26,12 @@ import VisumPy.helpers as helpers
 import wx.lib.filebrowsebutton as wxfb
 import tables
 
-modes_en2de = {'put': u'OV',
-         'car': u'Pkw-Fahrer',
-         'passenger': u'Pkw-Mitfahrer',
-         'bicycle': u'Fahrrad',
-         'foot': u'zu Fuss',
+modes_en2de = {'put': u'1-OV',
+         'car': u'2-Pkw-Fahrer',
+         'passenger': u'3-Pkw-Mitfahrer',
+         'bicycle': u'4-Fahrrad',
+         'foot': u'5-zu Fuss',
+         'all': u'0-Gesamtverkehr',
          }
 
 modes_de2en = dict(zip(modes_en2de.values(), modes_en2de.keys()))
@@ -79,9 +80,6 @@ class getMatrix(wx.Dialog):
                                                 changeCallback = self.On_list,
                                                 )
 
-        #self.auswahlButton = wx.Button(self, -1, _(u'Auswählen'), pos=(350, 50))
-        #self.Bind(wx.EVT_BUTTON, self.On_list, self.auswahlButton)
-
 
         # OK and Cancel
         self.btn_ok = wx.Button(self, -1, _("OK"), pos=(250, 150))
@@ -102,13 +100,13 @@ class getMatrix(wx.Dialog):
         filepath = str(self.openButton.GetValue())
         c=[]
         with tables.openFile(filepath, 'r') as f:
-            nodes = f.listNodes(f.root) # tables unter root
             ts = f.root.modes_ts        # group = modes_ts
 
             for node in ts:
                 cx = node.name
                 mode_name = modes_en2de[cx]
                 c.append(mode_name)
+            c.append('0-Gesamtverkehr')
         c.sort()
 
         self.tableText = wx.StaticText(self, -1,
@@ -119,7 +117,7 @@ class getMatrix(wx.Dialog):
                              style=wx.CB_DROPDOWN | wx.CB_DROPDOWN,
                              pos=(125,100),
                              )
-        self.cMatrix.SetSelection(2)
+        self.cMatrix.SetSelection(1)
 
 
     def On_cancel(self, event): # wxGlade: XLSParamsDlg.<event_handler>
@@ -141,7 +139,9 @@ class getMatrix(wx.Dialog):
         table_en = modes_de2en[table_de]
         param['table'] = table_en
 
-        if table_en in put_modes:
+        if table_en == 'all':
+            mode = 'Gesamt'
+        elif table_en in put_modes:
             mode = 'OV'
         else:
             mode = 'IV'
