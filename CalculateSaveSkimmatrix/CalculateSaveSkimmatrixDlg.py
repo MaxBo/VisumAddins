@@ -200,6 +200,7 @@ class Example(wx.Dialog):
             self.z4.Enable(False)
             self.z5.Enable(False)
             self.z24.Enable(True)
+            self.z24.SetValue(True)
             self.directory = os.path.join(self.base_path, 'matrices', 'skims_prt')
         else:
             self.z1.Enable(True)
@@ -208,6 +209,11 @@ class Example(wx.Dialog):
             self.z4.Enable(True)
             self.z5.Enable(True)
             self.z24.Enable(True)
+            self.z1.SetValue(True)
+            self.z2.SetValue(True)
+            self.z3.SetValue(True)
+            self.z4.SetValue(True)
+            self.z5.SetValue(True)
             self.directory = os.path.join(self.base_path, 'matrices', 'skims_put')
         self.openButton.startDirectory = self.directory
 

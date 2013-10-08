@@ -201,28 +201,6 @@ def Run(param):
 
             h.flush()
 
-    #"""CALIBREIEREN"""
-    ## Nachfragemodell aufrufen
-    #cmd = r'C:\Anaconda\python -m tdmks.main'
-    #if param["OVIV"]== "OV":
-        #pp = ''  # '--pp_put'
-        #p = '--put %s' %param["filepath"].split('\\')[-1]
-    #if param["OVIV"]== "IV":
-        #pp = ''  # '--pp_prt'
-        #p = '--prt %s' %param["filepath"].split('\\')[-1]
-    #full_cmd = ' '.join([cmd, p, pp, '--skip_run'])  ## cmd_zones
-    #addIn.ReportMessage(full_cmd)
-
-    #process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE)
-
-    #returnvalue = process.wait()
-    #if returnvalue == 1:
-        #addIn.ReportMessage('Fehler')
-    #if returnvalue == 0:
-        #addIn.ReportMessage('Fertig')
-
-    #Close command line??
-
 
 if len(sys.argv) > 1:
     addIn = AddIn()
