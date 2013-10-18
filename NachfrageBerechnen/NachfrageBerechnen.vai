@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<VisumAddInCollection Format="1.0.0">
+		<VisumAddIn>
+			<AddInID>GGR_CALCDEMAND</AddInID>
+			<AddInName>Nachfrage berechnen</AddInName>			<!-- todo AddInPath is not used yet -->
+			<AddInPath>GGR Matrix</AddInPath>
+			<AddInParaDlgScript>NachfrageBerechnenDlg.py</AddInParaDlgScript>
+			<AddInBodyScript>NachfrageBerechnenBody.py</AddInBodyScript>
+			<AddInOperation>true</AddInOperation>
+			<AddInAutoMenu>true</AddInAutoMenu>
+			<AddInAutoShowPara>true</AddInAutoShowPara>
+		</VisumAddIn>
+</VisumAddInCollection>
