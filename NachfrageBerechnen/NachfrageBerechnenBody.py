@@ -40,10 +40,13 @@ def Run(param):
         cmd_cal = '-c'
     else:cmd_cal=''
 
+	if param['korrektur']:
+        cmd_kor = '--update_kf'
+    else:cmd_kor=''
 
     # create full command
     full_cmd = ' '.join([cmd, cmd_name, cmd_put, cmd_prt,
-                         cmd_nmt, cmd_zonal, cmd_par, cmd_cal])
+                         cmd_nmt, cmd_zonal, cmd_par, cmd_cal, cmd_kor])
 
     # double check if really should run with Message box
     title = 'Starte Nachfragemodell mit folgendem Kommando'
