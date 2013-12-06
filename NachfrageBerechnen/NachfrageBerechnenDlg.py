@@ -55,8 +55,8 @@ class ParamsDlg(wx.Dialog):
                                       #pos=(15,375))
         #self.iv.SetValue(True)
 
-		self.korrektur = wx.CheckBox(self, label=u'Update der Korrekturfaktoren', id=2, pos=(15,375))
-		
+        self.korrektur = wx.CheckBox(self, label=u'Update der Korrekturfaktoren', id=2, pos=(15,375))
+
         # Combo Box Config Files
         """Get *.py from Combobox and execute *.py"""
         self.label_conf = wx.StaticText(self, -1, _('Konfiguration:'),
@@ -188,7 +188,7 @@ class ParamsDlg(wx.Dialog):
         param["Parameter"] = str(self.openParams.GetValue()).split('\\')[-1]
         param["Name"] = str(self.name1.GetValue())
         #param["Savepath"] = str(self.saveButton.GetValue())
-		param["korrektur"] = self.korrektur.GetValue()
+        param["korrektur"] = self.korrektur.GetValue()
 
 
         addInParam.SaveParameter(param)

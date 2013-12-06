@@ -200,7 +200,8 @@ def Run(param):
             zonetable = h.createTable(h.root, 'Bezirke', rec)
 
             h.flush()
-
+    # Remove Operation again
+    operations.RemoveOperation(1)
 
 if len(sys.argv) > 1:
     addIn = AddIn()

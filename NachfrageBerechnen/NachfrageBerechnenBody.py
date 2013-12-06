@@ -40,7 +40,7 @@ def Run(param):
         cmd_cal = '-c'
     else:cmd_cal=''
 
-	if param['korrektur']:
+    if param['korrektur']:
         cmd_kor = '--update_kf'
     else:cmd_kor=''
 
