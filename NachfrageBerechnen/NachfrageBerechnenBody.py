@@ -33,7 +33,7 @@ def Run(param):
     cmd_zonal = '--zd %s' % param["Struktur"]
     cmd_put = '--pp_put --put %s' % param["PUT"]
     cmd_prt = '--pp_prt --prt %s' % param["PRT"]
-    cmd_nmt = '--nmt %s' % param["NMT"]
+    cmd_nmt = '--pp_nmt --nmt %s' % param["NMT"]
     cmd_par = '--par %s' % param["Parameter"]
 
     if param['modal_split']:
