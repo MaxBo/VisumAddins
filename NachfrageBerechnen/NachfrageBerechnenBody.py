@@ -57,8 +57,8 @@ def Run(param):
         addIn.ReportMessage('Abbruch')
         return
 
-    process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE)
-    message = process.stdout.readline()
+    process = subprocess.Popen(full_cmd, stderr=subprocess.PIPE)
+    message = process.stderr.readline()
     group = None
     while len(message) > 0:
         #addIn.ReportMessage(message)
@@ -80,7 +80,7 @@ def Run(param):
             already_done = progressMax - to_do
 
             addIn.UpdateProgressDialog(already_done)
-        message = process.stdout.readline()
+        message = process.stderr.readline()
 
     #addIn.ReportMessage(message)
 
