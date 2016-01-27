@@ -76,7 +76,7 @@ def get_params_from_visum(Visum, scenario_name, params):
         the values for params in scenario
     """
     filetype_OtherOutputData = 89
-    pythonpath = str(Visum.GetPath(filetype_OtherOutputData))
+    pythonpath = os.path.join(str(Visum.GetPath(filetype_OtherOutputData)), 'python')
 
     filetype_OtherInputData = 88
     project_folder = str(Visum.GetPath(filetype_OtherInputData))
@@ -102,7 +102,7 @@ def get_scenarios_from_visum(Visum):
         the available scenarios
     """
     filetype_OtherOutputData = 89
-    pythonpath = str(Visum.GetPath(filetype_OtherOutputData))
+    pythonpath = os.path.join(str(Visum.GetPath(filetype_OtherOutputData)), 'python')
 
     filetype_OtherInputData = 88
     project_folder = str(Visum.GetPath(filetype_OtherInputData))
@@ -184,7 +184,7 @@ def clone_scenario_from_visum(Visum, template, scenario_name):
         the available scenarios
     """
     filetype_OtherOutputData = 89
-    pythonpath = str(Visum.GetPath(filetype_OtherOutputData))
+    pythonpath = os.path.join(str(Visum.GetPath(filetype_OtherOutputData)), 'python')
 
     filetype_OtherInputData = 88
     project_folder = str(Visum.GetPath(filetype_OtherInputData))
@@ -261,28 +261,32 @@ def validate_scenario_from_visum(Visum):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description="Parameter Importer")
+    r = get_scenarios_from_visum(Visum)
+    raise ValueError(r)
+    print(r)
 
-    parser.add_argument("-f", action="store",
-                        help="Projektordner mit XML-Projektdatei",
-                        dest="project_folder", default=None)
-
-    parser.add_argument("-s", action="store",
-                        help="angegebenes Szenario ausführen",
-                        dest="scenario_name", default=None)
-
-    parser.add_argument("--params", action="store",
-                       help="suche angegebene Parameter",
-                       dest="params", default=None, nargs='+')
-
-    parser.add_argument("--pythonpath", action="store",
-                      help="angegebenes Szenario ausführen",
-                      dest="pythonpath", default='python')
-
-    options = parser.parse_args()
-
-    res = get_scenarios(**options.__dict__)
-    print(res)
-
-    res = get_params(**options.__dict__)
-    print(res)
+##    parser = ArgumentParser(description="Parameter Importer")
+##
+##    parser.add_argument("-f", action="store",
+##                        help="Projektordner mit XML-Projektdatei",
+##                        dest="project_folder", default=None)
+##
+##    parser.add_argument("-s", action="store",
+##                        help="angegebenes Szenario ausführen",
+##                        dest="scenario_name", default=None)
+##
+##    parser.add_argument("--params", action="store",
+##                       help="suche angegebene Parameter",
+##                       dest="params", default=None, nargs='+')
+##
+##    parser.add_argument("--pythonpath", action="store",
+##                      help="angegebenes Szenario ausführen",
+##                      dest="pythonpath", default='python')
+##
+##    options = parser.parse_args()
+##
+##    res = get_scenarios(**options.__dict__)
+##    print(res)
+##
+##    res = get_params(**options.__dict__)
+##    print(res)
