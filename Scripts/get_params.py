@@ -191,6 +191,75 @@ def clone_scenario_from_visum(Visum, template, scenario_name):
 
     return clone_scenario(project_folder, pythonpath, template, scenario_name)
 
+
+def validate_scenario(project_folder,
+                      scenario_name,
+                      pythonpath=r'python',
+                      **kwargs):
+    """
+    validate available scenarios
+
+    Parameters
+    ----------
+    project_folder : str
+        path to the project folder
+    scenario_name : str
+        name of the scenario
+
+    pythonpath : str (optional, default='python')
+        path of python executable
+    Returns
+    -------
+    scenarios : list of str
+        the available scenarios
+    """
+    project_xml_file = os.path.join(project_folder, 'project.xml')
+    cmd = '{pythonpath} -m gui_vm.validate_scenario -f "{project_xml_file}" -s {sc}'
+    c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
+                                    project_xml_file=project_xml_file,
+                                    sc=scenario_name),
+                         stdout=subprocess.PIPE, shell=True)
+
+    line = c.stdout.readline().strip()
+    if line.startswith('selected scenario:'):
+        scenario = line.split(':')[1]
+    elif line.endswith('invalid'):
+        scenario = line.split(' ')[1]
+        msg = 'scenario {sc}: not all input validated yet'.format(sc=scenario)
+        print(msg)
+    else:
+        raise ValueError(line)
+    return scenario
+
+def validate_scenario_from_visum(Visum):
+    """
+    Validate scenario
+
+    Parameters
+    ----------
+    Visum : Visum-instance
+
+    Returns
+    -------
+    scenarios : list of str
+        the available scenarios
+    """
+    filetype_OtherOutputData = 89
+    pythonpath = str(Visum.GetPath(filetype_OtherOutputData))
+
+    filetype_OtherInputData = 88
+    project_folder = str(Visum.GetPath(filetype_OtherInputData))
+
+    scenario_name = Visum.Net.AttValue('ScenarioCode')
+
+    # validate if scenario exists and is valid, or create and select a scenario
+    scenario_name = validate_scenario(project_folder,
+                                      scenario_name,
+                                      pythonpath)
+
+    Visum.Net.SetAttValue('ScenarioCode', scenario_name)
+
+
 if __name__ == '__main__':
     parser = ArgumentParser(description="Parameter Importer")
 

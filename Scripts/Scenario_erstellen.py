@@ -29,7 +29,7 @@ class ValidateScerario(object):
         self.scenarios = get_scenarios_from_visum(Visum)
 
     def validate_scenarios(self):
-        scenario_name = Visum.CurrentProject.Scenarios.name
+        scenario_name = Visum.Net.AttValue('ScenarioCode')
         if not scenario_name in self.scenarios:
             cmd = '{pythonpath} -m gui_vm.clone_scenario -o "{project_xml_file}" -t "{template}" -s "{new_scenario}"'
 
