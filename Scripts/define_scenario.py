@@ -15,9 +15,9 @@ from get_params import validate_scenario_from_visum
 
 def main():
     # take scenario_name from Net Attributes if defined
-    scenario_name = Visum.AttValue('ScenarioCode')
+    scenario_name = Visum.Net.AttValue('ScenarioCode')
     # validate the Scenario_name or create a new one
-    scenario_name = validate_scenario_from_visum(scenario_name)
+    scenario_name = validate_scenario_from_visum(Visum)
 
     # create a Scenario Modification (or define a new one)
     project = Visum.ScenarioManagement.CurrentProject

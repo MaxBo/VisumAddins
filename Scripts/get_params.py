@@ -215,10 +215,12 @@ def validate_scenario(project_folder,
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
     cmd = '{pythonpath} -m gui_vm.validate_scenario -f "{project_xml_file}" -s {sc}'
-    c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
-                                    project_xml_file=project_xml_file,
-                                    sc=scenario_name),
+    fullcmd = cmd.format(pythonpath=pythonpath,
+                         project_xml_file=project_xml_file,
+                         sc=scenario_name)
+    c = subprocess.Popen(fullcmd,
                          stdout=subprocess.PIPE, shell=True)
+    #raise BaseException(fullcmd)
 
     line = c.stdout.readline().strip()
     if line.startswith('selected scenario:'):
@@ -228,7 +230,7 @@ def validate_scenario(project_folder,
         msg = 'scenario {sc}: not all input validated yet'.format(sc=scenario)
         print(msg)
     else:
-        raise ValueError(line)
+        raise ValueError(fullcmd)
     return scenario
 
 def validate_scenario_from_visum(Visum):
