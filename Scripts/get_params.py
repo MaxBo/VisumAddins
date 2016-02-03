@@ -18,7 +18,7 @@ from argparse import ArgumentParser
 
 
 def get_params(project_folder, scenario_name, params,
-               pythonpath=r'python'):
+               pythonpath=r''):
     """
     get param values for params for scenario
 
@@ -33,8 +33,8 @@ def get_params(project_folder, scenario_name, params,
     params : list of str
         the parameters to read
 
-    pythonpath : str (optional, default='python')
-        path of python executable
+    pythonpath : str (optional)
+        path of directory, where python executable resides
 
     Returns
     -------
@@ -43,7 +43,7 @@ def get_params(project_folder, scenario_name, params,
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
     params_to_read = ' '.join(('"{param}"'.format(param=param) for param in params))
-    cmd = '{pythonpath} -m gui_vm.get_param_from_config -o "{project_xml_file}" -s "{scenario_name}" -p {params_to_read}'
+    cmd = '{pythonpath}python -m gui_vm.get_param_from_config -o "{project_xml_file}" -s "{scenario_name}" -p {params_to_read}'
     c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
                                     project_xml_file=project_xml_file,
                                     scenario_name=scenario_name,
@@ -110,7 +110,7 @@ def get_scenarios_from_visum(Visum):
     return get_scenarios(project_folder, pythonpath)
 
 
-def get_scenarios(project_folder, pythonpath=r'python', **kwargs):
+def get_scenarios(project_folder, pythonpath=r'', **kwargs):
     """
     get available scenarios
 
@@ -119,15 +119,15 @@ def get_scenarios(project_folder, pythonpath=r'python', **kwargs):
     project_folder : str
         path to the project folder
 
-    pythonpath : str (optional, default='python')
-        path of python executable
+    pythonpath : str (optional)
+        path to python executable directory
     Returns
     -------
     scenarios : list of str
         the available scenarios
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
-    cmd = '{pythonpath} -m gui_vm.get_scenarios_from_config -o "{project_xml_file}"'
+    cmd = '{pythonpath}python -m gui_vm.get_scenarios_from_config -o "{project_xml_file}"'
     c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
                                     project_xml_file=project_xml_file),
                          stdout=subprocess.PIPE, shell=True)
@@ -155,7 +155,7 @@ def clone_scenario(project_folder, pythonpath,
     scenario_name : str
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
-    cmd = '{pythonpath} -m gui_vm.clone_scenario -o "{project_xml_file}" -t "{template}" -s "{new_scenario}"'
+    cmd = '{pythonpath}python -m gui_vm.clone_scenario -o "{project_xml_file}" -t "{template}" -s "{new_scenario}"'
     c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
                                     project_xml_file=project_xml_file,
                                     template=template,
@@ -194,7 +194,7 @@ def clone_scenario_from_visum(Visum, template, scenario_name):
 
 def validate_scenario(project_folder,
                       scenario_name,
-                      pythonpath=r'python',
+                      pythonpath=r'',
                       **kwargs):
     """
     validate available scenarios
@@ -206,15 +206,15 @@ def validate_scenario(project_folder,
     scenario_name : str
         name of the scenario
 
-    pythonpath : str (optional, default='python')
-        path of python executable
+    pythonpath : str (optional')
+        path of directory where python executable resides
     Returns
     -------
     scenarios : list of str
         the available scenarios
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
-    cmd = '{pythonpath} -m gui_vm.validate_scenario -f "{project_xml_file}" -s {sc}'
+    cmd = '{pythonpath}python -m gui_vm.validate_scenario -f "{project_xml_file}" -s {sc}'
     fullcmd = cmd.format(pythonpath=pythonpath,
                          project_xml_file=project_xml_file,
                          sc=scenario_name)
