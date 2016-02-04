@@ -40,7 +40,7 @@ def validate(Visum, use_scenario_from_net=True):
         if m.AttValue('Group') == u'DemandScenarios':
             m_no = m.AttValue('No')
             if m_no != modification.AttValue('No'):
-                exclusions.append(str(m_no))
+                exclusions.append('{:0.0f}'.format(m_no))
     modification.SetAttValue(u'Exclusion', u','.join(exclusions))
 
 
