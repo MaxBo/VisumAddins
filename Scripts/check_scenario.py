@@ -13,7 +13,7 @@
 from get_params import validate_scenario_from_visum
 
 
-def main():
+def validate(Visum, use_scenario_from_net=True):
     try:
         project = Visum.ScenarioManagement.CurrentProject
     except:
@@ -23,7 +23,7 @@ def main():
     # take scenario_name from Net Attributes if defined
     scenario_name = Visum.Net.AttValue('ScenarioCode')
     # validate the Scenario_name or create a new one
-    scenario_name = validate_scenario_from_visum(Visum)
+    scenario_name = validate_scenario_from_visum(Visum, use_scenario_from_net)
 
     # create a Scenario Modification (or define a new one)
     project = Visum.ScenarioManagement.CurrentProject
@@ -35,9 +35,13 @@ def main():
     Visum.Net.SetAttValue('ScenarioCode', scenario_name)
     modification.EndEditModification()
     # set it to incompatible to other modifications in group "ScenarioNames"
+    exclusions = []
     for m in project.Modifications:
-        if m.AttValue('Group') == 'DemandScenarios':
-            modification.DoesNotOverlapWith(m.AttValue('No'))
+        if m.AttValue('Group') == u'DemandScenarios':
+            m_no = m.AttValue('No')
+            if m_no != modification.AttValue('No'):
+                exclusions.append(str(m_no))
+    modification.SetAttValue(u'Exclusion', u','.join(exclusions))
 
 
 def get_modification_by_code(project, code):
@@ -51,7 +55,3 @@ def get_modification_by_code(project, code):
     modification = project.AddModification()
     modification.SetAttValue('Code', code)
     return modification
-
-
-if __name__ == '__main__':
-    main()

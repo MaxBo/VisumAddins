@@ -261,13 +261,15 @@ def validate_scenario(project_folder,
         raise ValueError(fullcmd+line)
     return scenario
 
-def validate_scenario_from_visum(Visum):
+def validate_scenario_from_visum(Visum, use_scenario_from_net=True):
     """
     Validate scenario
 
     Parameters
     ----------
     Visum : Visum-instance
+
+    use_scenario_from_net : bool, optional(Default=True)
 
     Returns
     -------
@@ -276,7 +278,10 @@ def validate_scenario_from_visum(Visum):
     """
     pythonpath, project_folder = get_folders(Visum)
 
-    scenario_name = Visum.Net.AttValue('ScenarioCode')
+    if use_scenario_from_net:
+        scenario_name = Visum.Net.AttValue('ScenarioCode')
+    else:
+        scenario_name = None
 
     # validate if scenario exists and is valid, or create and select a scenario
     scenario_name = validate_scenario(project_folder,

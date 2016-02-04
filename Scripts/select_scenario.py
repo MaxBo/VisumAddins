@@ -14,4 +14,4 @@ from check_scenario import validate
 
 
 if __name__ == '__main__':
-    validate(Visum, use_scenario_from_net=True)
+    validate(Visum, use_scenario_from_net=False)
