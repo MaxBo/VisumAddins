@@ -43,12 +43,14 @@ def get_params(project_folder, scenario_name, params,
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
     params_to_read = ' '.join(('"{param}"'.format(param=param) for param in params))
-    cmd = '{pythonpath}python -m gui_vm.get_param_from_config -o "{project_xml_file}" -s "{scenario_name}" -p {params_to_read}'
+    cmd = '{pythonpath} -m gui_vm.get_param_from_config -o "{project_xml_file}" -s "{scenario_name}" -p {params_to_read}'
     c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
                                     project_xml_file=project_xml_file,
                                     scenario_name=scenario_name,
                                     params_to_read=params_to_read),
-                         stdout=subprocess.PIPE, shell=True)
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT,
+                         shell=True)
 
     param_values = {}
     for i, path in enumerate(c.stdout.readlines()):
@@ -75,11 +77,7 @@ def get_params_from_visum(Visum, scenario_name, params):
     param_values : list of str
         the values for params in scenario
     """
-    filetype_OtherOutputData = 89
-    pythonpath = os.path.join(str(Visum.GetPath(filetype_OtherOutputData)), 'python')
-
-    filetype_OtherInputData = 88
-    project_folder = str(Visum.GetPath(filetype_OtherInputData))
+    pythonpath, project_folder = get_folders(Visum)
 
     res = get_params(project_folder=project_folder,
                      scenario_name=scenario_name,
@@ -101,11 +99,7 @@ def get_scenarios_from_visum(Visum):
     scenarios : list of str
         the available scenarios
     """
-    filetype_OtherOutputData = 89
-    pythonpath = os.path.join(str(Visum.GetPath(filetype_OtherOutputData)), 'python')
-
-    filetype_OtherInputData = 88
-    project_folder = str(Visum.GetPath(filetype_OtherInputData))
+    pythonpath, project_folder = get_folders(Visum)
 
     return get_scenarios(project_folder, pythonpath)
 
@@ -127,10 +121,12 @@ def get_scenarios(project_folder, pythonpath=r'', **kwargs):
         the available scenarios
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
-    cmd = '{pythonpath}python -m gui_vm.get_scenarios_from_config -o "{project_xml_file}"'
+    cmd = '{pythonpath} -m gui_vm.get_scenarios_from_config -o "{project_xml_file}"'
     c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
                                     project_xml_file=project_xml_file),
-                         stdout=subprocess.PIPE, shell=True)
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT,
+                         shell=True)
 
     scenarios = []
     for i, scenario in enumerate(c.stdout.readlines()):
@@ -155,15 +151,51 @@ def clone_scenario(project_folder, pythonpath,
     scenario_name : str
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
-    cmd = '{pythonpath}python -m gui_vm.clone_scenario -o "{project_xml_file}" -t "{template}" -s "{new_scenario}"'
+    cmd = '{pythonpath} -m gui_vm.clone_scenario -o "{project_xml_file}" -t "{template}" -s "{new_scenario}"'
     c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
                                     project_xml_file=project_xml_file,
                                     template=template,
                                     new_scenario=scenario_name),
-                         stdout=subprocess.PIPE, shell=True)
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT,
+                         shell=True)
 
     for i, scenario in enumerate(c.stdout.readlines()):
         print(i, scenario)
+
+def get_folders(Visum):
+    """
+    return folders
+    """
+    version = Visum.VersionNumber[:2]
+    visum_appdata = {'15': os.path.join('PTV Vision', 'PTV Visum 15'),
+                     }
+
+    p = os.path.join(
+        os.environ['APPDATA'],
+        visum_appdata.get(version,
+                          os.path.join('PTV Vision',
+                                       'PTV Visum {}'.format(version))),
+    )
+    pfd = os.path.join(p, 'ggr.pfd')
+    folders = {}
+    try:
+        with open(pfd) as f:
+            lines = f.readlines()
+            for line in lines:
+                l = line.strip().split('=')
+                if len(l) > 1:
+                    folders[l[0]] = l[1]
+    except IOError as e:
+        print('ggr.pfd not found in {}'.format(p))
+        raise e
+    try:
+        pythonpath = os.path.join(folders['ExecutableFolder'], 'python')
+        project_folder = folders['ProjectFolder']
+    except KeyError as e:
+        print('key not found in {pdf}'.format(pfd))
+        raise e
+    return pythonpath, project_folder
 
 
 def clone_scenario_from_visum(Visum, template, scenario_name):
@@ -183,12 +215,7 @@ def clone_scenario_from_visum(Visum, template, scenario_name):
     scenarios : list of str
         the available scenarios
     """
-    filetype_OtherOutputData = 89
-    pythonpath = os.path.join(str(Visum.GetPath(filetype_OtherOutputData)), 'python')
-
-    filetype_OtherInputData = 88
-    project_folder = str(Visum.GetPath(filetype_OtherInputData))
-
+    pythonpath, project_folder = get_folders(Visum)
     return clone_scenario(project_folder, pythonpath, template, scenario_name)
 
 
@@ -214,13 +241,14 @@ def validate_scenario(project_folder,
         the available scenarios
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
-    cmd = '{pythonpath}python -m gui_vm.validate_scenario -f "{project_xml_file}" -s {sc}'
+    cmd = '{pythonpath} -m gui_vm.validate_scenario -f "{project_xml_file}" -s {sc}'
     fullcmd = cmd.format(pythonpath=pythonpath,
                          project_xml_file=project_xml_file,
                          sc=scenario_name)
     c = subprocess.Popen(fullcmd,
-                         stdout=subprocess.PIPE, shell=True)
-    #raise BaseException(fullcmd)
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT,
+                         shell=True)
 
     line = c.stdout.readline().strip()
     if line.startswith('selected scenario:'):
@@ -230,7 +258,7 @@ def validate_scenario(project_folder,
         msg = 'scenario {sc}: not all input validated yet'.format(sc=scenario)
         print(msg)
     else:
-        raise ValueError(fullcmd)
+        raise ValueError(fullcmd+line)
     return scenario
 
 def validate_scenario_from_visum(Visum):
@@ -246,11 +274,7 @@ def validate_scenario_from_visum(Visum):
     scenarios : list of str
         the available scenarios
     """
-    filetype_OtherOutputData = 89
-    pythonpath = str(Visum.GetPath(filetype_OtherOutputData))
-
-    filetype_OtherInputData = 88
-    project_folder = str(Visum.GetPath(filetype_OtherInputData))
+    pythonpath, project_folder = get_folders(Visum)
 
     scenario_name = Visum.Net.AttValue('ScenarioCode')
 
@@ -259,13 +283,14 @@ def validate_scenario_from_visum(Visum):
                                       scenario_name,
                                       pythonpath)
 
-    Visum.Net.SetAttValue('ScenarioCode', scenario_name)
+    #Visum.Net.SetAttValue('ScenarioCode', scenario_name)
+    return scenario_name
 
 
 if __name__ == '__main__':
     r = get_scenarios_from_visum(Visum)
-    raise ValueError(r)
     print(r)
+    raise ValueError(r)
 
 ##    parser = ArgumentParser(description="Parameter Importer")
 ##

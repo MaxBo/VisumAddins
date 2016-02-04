@@ -14,6 +14,12 @@ from get_params import validate_scenario_from_visum
 
 
 def main():
+    try:
+        project = Visum.ScenarioManagement.CurrentProject
+    except:
+        msg = 'You have to run this Script out of the Scenario-Management'
+        raise RuntimeError(msg)
+
     # take scenario_name from Net Attributes if defined
     scenario_name = Visum.Net.AttValue('ScenarioCode')
     # validate the Scenario_name or create a new one
@@ -21,16 +27,16 @@ def main():
 
     # create a Scenario Modification (or define a new one)
     project = Visum.ScenarioManagement.CurrentProject
-    code = 'Scenario_{sc}'.format(sc=scenario_name)
-    modification = get_modification_by_code(code)
-    modification.SetAttValue('Group', 'ScenarioNames')
+    code = 'DemandScenario_{sc}'.format(sc=scenario_name)
+    modification = get_modification_by_code(project, code)
+    modification.SetAttValue('Group', 'DemandScenarios')
     # defnie the modification
     modification.StartEditModification()
-    Visum.SetAttValue('ScenarioCode', scenario_name)
+    Visum.Net.SetAttValue('ScenarioCode', scenario_name)
     modification.EndEditModification()
     # set it to incompatible to other modifications in group "ScenarioNames"
     for m in project.Modifications:
-        if m.AttValue('Group') == 'ScenarioNames':
+        if m.AttValue('Group') == 'DemandScenarios':
             modification.DoesNotOverlapWith(m.AttValue('No'))
 
 
@@ -39,7 +45,7 @@ def get_modification_by_code(project, code):
     return a modification with a given code or create a new one, if not exists
     """
     modifications = project.Modifications
-    for modification in modifications.Iterator():
+    for modification in modifications:
         if modification.AttValue('Code') == code:
             return modification
     modification = project.AddModification()
