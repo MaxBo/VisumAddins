@@ -10,7 +10,7 @@ if __package__ is None:
     from os import sys, path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-from helpers.get_folders import get_folders
+from helpers.get_folders import get_folders, get_appdata_path
 from XMLHelper import XMLReader
 import codecs
 import os
@@ -31,6 +31,7 @@ class AddTimeSlices(object):
         self.scenario_name = params['demand_scenario']
         self.parametersets = params['parametersets']
         self.temp_xml = self.create_xml()
+        self.appdata_visum_path = get_appdata_path(Visum)
         self.add_xml()
 
     def create_xml(self):
@@ -120,13 +121,13 @@ class AddTimeSlices(object):
         add operations for each time interval
         """
         OPERATIONTYPE_GROUP = 75
-        # find the position to insert
+        # find the self.position to insert
         operations = Visum.Procedures.Operations
         group_found = False
         for operation in operations.GetAll:
             if operation.AttValue('OperationType') == OPERATIONTYPE_GROUP:
                 if operation.AttValue('Comment') == 'PuTSkimMatrixCalculation':
-                    position = int(operation.AttValue('No'))
+                    self.position = int(operation.AttValue('No'))
                     group_found = True
                     break
         # create Group SkimMatrixCalculation if not exists
@@ -136,27 +137,45 @@ class AddTimeSlices(object):
         # add for each analysis time the operations
         at = Visum.Procedures.Functions.AnalysisTimes
         n_intervals = at.NumTimeIntervals
+        n_time_sclices = 0
         for t in range(1, n_intervals + 1):
             time_interval = at.TimeInterval(t)
             is_aggregate = time_interval.AttValue('IsAggregate')
             if not is_aggregate:
                 at.CurrentTimeInterval = t
-                self.add_operation_timeslice(position, time_interval)
-                position += 1
+                self.add_operation_define_timeinterval(t - 1)
+                self.add_operation_timeslice(time_interval)
+                self.add_operation_script()
+                n_time_sclices += 1
+        Visum.Net.SetAttValue('NUM_OF_TIMESLICES', n_time_sclices)
 
     def create_group_put_skim_matrix_calculation(self):
         OPERATIONTYPE_GROUP = 75
-        # find the position to insert
+        # find the self.position to insert
         operations = Visum.Procedures.Operations
         n_operations = len(operations.GetAll)
         op = operations.AddOperation(n_operations + 1)
         op.SetAttValue('OperationType', OPERATIONTYPE_GROUP)
         op.SetAttValue('Comment', 'PuTSkimMatrixCalculation')
-        position = n_operations + 1
+        self.position = n_operations + 1
 
+    def add_operation_define_timeinterval(self, t):
+        OPERATIONTYPE_EDITATTRIBUTE = 54
+        operations = Visum.Procedures.Operations
+        op = operations.AddOperation(self.position + 1)
+        op.SetAttValue('OperationType', OPERATIONTYPE_EDITATTRIBUTE)
+        op.SetAttValue('Code', 'OV_Skims')
+        comment = 'Define Time Interval'
+        op.SetAttValue('Comment', comment)
+        formula_params = op.AttributeFormulaParameters
+        formula = formula_params.SetAttValue('NetObjectType', 'NETWORK')
+        formula = formula_params.SetAttValue('ResultAttrName',
+                                             'CURRENT_TIME_INTERVAL')
+        formula = str(t)
+        formula = formula_params.SetAttValue('Formula', formula)
+        self.position += 1
 
-
-    def add_operation_timeslice(self, position, time_interval):
+    def add_operation_timeslice(self, time_interval):
         """
         Add for each timeslice the operations
         """
@@ -166,11 +185,6 @@ class AddTimeSlices(object):
         folder_ProcSettings = Visum.GetPath(filetype_ProcSettings)
         default_xml_file = os.path.join(folder_ProcSettings,
                                         'ov_kgmatrix_operation.xml')
-        #with codecs.open(tmp_filename, "w", "utf_8_sig") as f:
-            #xml = XMLReader(default_xml_file)
-            #op = xml.GetElementsByName(u'OPERATION')[0]
-            #op.setAttribute('NO', str(position))
-            #f.write(xml._XMLReader__config.toprettyxml())
 
         # insert operation at given position
         ReadOperations_Insert = 2
@@ -178,16 +192,39 @@ class AddTimeSlices(object):
                                             readOperations=True,
                                             readFunctions=False,
                                             roType=ReadOperations_Insert,
-                                            insertPosition=position)
+                                            insertPosition=self.position)
         # modify start and end time
         operations = Visum.Procedures.Operations
-        op = operations.ItemByKey(position + 1)
+        op = operations.ItemByKey(self.position + 1)
+        op.SetAttValue('Active', True)
+        op.SetAttValue('Code', 'OV_Skims')
+        comment = '{}: KG-Matrizen'.format(time_interval.AttValue('Name'))
+        op.SetAttValue('Comment', comment)
         put_ckmp = op.PuTCalcSkimMatrixParameters
         ttp = put_ckmp.TimetableBasedParameters
         ttbp = ttp.BaseParameters
         ttbp.SetTimeIntervalEnd(time_interval.AttValue('EndTime'))  # Time in seconds
         ttbp.SetTimeIntervalStart(time_interval.AttValue('StartTime'))  # Time in seconds
-        #addIn.ReportMessage('{}'.format(position))
+        self.position += 1
+
+    def add_operation_script(self):
+        """Add Operation Script export matrices to hdf5"""
+        OPERATIONTYPE_SCRIPT = 65
+        #OPERATIONTYPE_ADDIN = 84
+        operations = Visum.Procedures.Operations
+        op = operations.AddOperation(self.position + 1)
+        op.SetAttValue('OperationType', OPERATIONTYPE_SCRIPT)
+        op.SetAttValue('Code', 'OV_Skims')
+        comment = 'Export Matrices to hdf5'
+        op.SetAttValue('Comment', comment)
+        script_params = op.AddInParams
+        filename = os.path.join(self.appdata_visum_path,
+                                'AddIns',
+                                'GGR_Demand_Scripts',
+                                'export_put_skim_matrices_to_hdf5.py')
+        script_params.SetAttValue('FileName', filename)
+        self.position += 1
+
 
 
 if len(sys.argv) > 1:
