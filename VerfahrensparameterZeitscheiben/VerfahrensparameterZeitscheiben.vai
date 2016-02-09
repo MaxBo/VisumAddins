@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<VisumAddInCollection Format="1.0.0">
+		<VisumAddIn>
+			<AddInID>GGR_IMPORTTIMESLICE</AddInID>
+			<AddInName>Zeitscheiben aus Nachfragemodell importieren</AddInName>
+			<AddInPath>GGR DEMAND</AddInPath>
+			<AddInParaDlgScript>VerfahrensparameterZeitscheibenDlg.py</AddInParaDlgScript>
+			<AddInBodyScript>VerfahrensparameterZeitscheibenBody.py</AddInBodyScript>
+			<AddInOperation>true</AddInOperation>
+			<AddInAutoMenu>true</AddInAutoMenu>
+			<AddInAutoShowPara>true</AddInAutoShowPara>
+		</VisumAddIn>
+</VisumAddInCollection>

@@ -18,17 +18,13 @@ import os
 import sys
 import subprocess
 from argparse import ArgumentParser
-from collections import OrderedDict
-from pprint import pprint
-from decoder import Dict2XML
 import tempfile
-import latinze
 
 
 #from VisumPy.helpers import GetMatrix, SetMatrix
 from tables.exceptions import NoSuchNodeError
 
-from get_params import get_params, get_params_from_visum
+from get_params import get_params, get_params_from_visum, get_folders
 
 i = []
 # Zeitschiebe aus GUI
@@ -38,122 +34,17 @@ class CalcMatrix(object):
 
     mode = 'OV'
 
-    @classmethod
-    def fromProjectFile(cls, project_folder, scenario_name, pythonpath):
-        self = cls.__new__(CalcMatrix)
-        self.scenario_name = scenario_name
-        params = get_params(project_folder, scenario_name,
-                            params=[self.mode, 'Params'],
-                            pythonpath=pythonpath)
-        self.h5_file = params[self.mode]
-        self.h5_params_file = params['Params']
-        self.time_series = []
-        return self
-
     def __init__(self):
-        self.scenario_name = Visum.Net.AttVal('ScenarioName')
-        params = get_params_from_visum(Visum, scenario_name)
+        self.scenario_name = Visum.Net.AttValue('ScenarioCode')
+        params = get_params_from_visum(Visum,
+                                       self.scenario_name,
+                                       ('Params', self.mode))
         self.h5_file = params[self.mode]
         self.h5_params_file = params['Params']
         self.time_series = []
-
-    def import_time_series(self):
-        with tables.openFile(self.h5_params_file) as h:
-            try:
-                time_series = h.root.activities.time_series[:]
-            except NoSuchNodeError:
-                msg = 'No table activities.time_series defined in {}'
-                raise NoSuchNodeError(msg.format(self.h5_params_file))
-            if not len(time_series):
-                msg = 'table activities.time_series in {} is empty'
-                raise ValueError(msg.format(self.h5_params_file))
-        self.add_xml(time_series)
-
-    def add_xml(self, time_series):
-        """create time interval xml and import into Visum"""
-        time_intervals = []
-        d = {'@PROCEDURES': {'VERSION': '7'},
-             'PROCEDURES': {'FUNCTIONS': {
-                 '@ANALYSISTIMES': {'ENDDAYINDEX': '1',
-                                    'STARTDAYINDEX': '1',
-                                    'USEONPRTRESULTS': '1',
-                                    'USEONPUTRESULTS': '1'},
-                 'ANALYSISTIMEINTERVAL': time_intervals, }
-             }}
-        codes = []
-        for t, ts in enumerate(time_series):
-            ti = self.add_time_interval(ts['from_hour'],
-                                        ts['to_hour'],
-                                        codes,
-                                        code=ts['code'])
-
-            time_intervals.append(ti)
-        aggr_ti = self.add_time_interval(time_series[0]['from_hour'],
-                                         time_series[-1]['to_hour'],
-                                         codes,
-                                         is_aggregate=True)
-        time_intervals.append(aggr_ti)
-
-        pprint(d)
-        # write xml to tempfile
-        x = Dict2XML().parse(d)
-        temp_path = tempfile.mktemp(suffix='xml')
-        with open(temp_path, mode='w') as t:
-            t.write(x)
-        # and import to Visum
-        ReadOperations_ReplaceAll = 0
-        Visum.Procedures.OpenXmlWithOptions(temp_path,
-                                            readOperations=False,
-                                            readFunctions=True,
-                                            roType=ReadOperations_ReplaceAll)
-
-
-    def add_time_interval(self, starttime, endtime, codes, is_aggregate=False):
-        """
-        create xml-code for time interval
-
-        Parameters
-        ----------
-        starttime : int
-        endtime : int
-        codes : list
-        is_aggregate : bool (optional, default=False)
-        code : str, optional
-            if not given, it will be derived from the start- and endtime
-        """
-        code = '{st:02d}{et:02d}'.format(st=starttime, et=endtime)
-        name = '{st:02d}h-{et:02d}h'.format(st=starttime, et=endtime)
-        et = '{et:02d}:59:59'.format(et=endtime - 1)
-        st = '{st:02d}:00:00'.format(st=starttime)
-        if is_aggregate:
-            ISAGGREGATE = '1'
-            DERIVEDFROM = ','.join(codes)
-            AGGRFUNCTION = 'SUM'
-
-        else:
-            ISAGGREGATE = '0'
-            DERIVEDFROM = ''
-            AGGRFUNCTION = 'MEAN'
-
-
-        ti = {'#ANALYSISTIMEINTERVAL':
-              {'AGGRFUNCTION': AGGRFUNCTION,
-               'CODE': code,
-               'DERIVEDFROM': DERIVEDFROM,
-               'ENDDAYINDEX': '1',
-               'ENDTIME': et,
-               'ISAGGREGATE': ISAGGREGATE,
-               'NAME': name,
-               'STARTDAYINDEX': '1',
-               'STARTTIME': st,
-               }}
-
-        if not is_aggregate:
-            codes.append(code)
-        return ti
-
-    def remove_time_series(self):
-        """remove all time series"""
+        pythonpath, project_folder = get_folders(Visum)
+        self.pythonpath = pythonpath
+        self.project_folder = project_folder
 
     def calc(self):
         """calculate the skim matrices by looping over the time intervals"""
@@ -308,5 +199,5 @@ if __name__ == '__main__':
 ##                                            options.pythonpath)
     calcMatrix = CalcMatrix()
     calcMatrix.import_time_series()
-    calcMatrix.calc()
+    #calcMatrix.calc()
 

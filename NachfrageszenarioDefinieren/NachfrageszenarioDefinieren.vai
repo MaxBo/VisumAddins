@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<VisumAddInCollection Format="1.0.0">
+		<VisumAddIn>
+			<AddInID>GGR_SELECT_DEMAND_SCENARIO</AddInID>
+			<AddInName>Nachfrageszenario Definieren und Auswählen</AddInName>
+			<AddInPath>GGR DEMAND</AddInPath>
+			<AddInBodyScript>NachfrageszenarioDefinierenBody.py</AddInBodyScript>
+			<AddInOperation>false</AddInOperation>
+			<AddInAutoMenu>true</AddInAutoMenu>
+			<AddInAutoShowPara>false</AddInAutoShowPara>
+		</VisumAddIn>
+</VisumAddInCollection>

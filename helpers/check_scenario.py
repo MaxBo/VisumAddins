@@ -6,11 +6,13 @@
 # Author:      Max Bohnet
 #
 # Created:     20.01.2016
-# Copyright:   (c) Barcelona 2013
-# Licence:     <your licence>
 #------------------------------------------------------------------------------
 
-from get_params import validate_scenario_from_visum
+if __package__ is None:
+    from os import sys, path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
+from helpers.get_params import validate_scenario_from_visum
 
 
 def validate(Visum, use_scenario_from_net=True):
