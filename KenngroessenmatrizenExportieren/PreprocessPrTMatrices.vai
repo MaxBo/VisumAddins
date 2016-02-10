@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<VisumAddInCollection Format="1.0.0">
+		<VisumAddIn>
+			<AddInID>GGR_PREPROCESS_PRT_MATRICES</AddInID>
+			<AddInName>MIV-Matrizen vorberechnen</AddInName>
+			<AddInPath>GGR DEMAND</AddInPath>
+			<AddInBodyScript>PreprocessPrTMatricesBody.py</AddInBodyScript>
+			<AddInOperation>true</AddInOperation>
+			<AddInAutoMenu>true</AddInAutoMenu>
+			<AddInAutoShowPara>true</AddInAutoShowPara>
+		</VisumAddIn>
+</VisumAddInCollection>

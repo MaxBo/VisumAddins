@@ -46,7 +46,7 @@ class ImportDemandMatrices(object):
                                             [run_name])
         self.filepath = self.params[run_name]
 
-    def import_arrays(self, mode):
+    def import_arrays(self, mode, tablename):
         """Import Array """
         # Free Matrix NO
         matrices = self.Visum.Net.Matrices.GetAll
@@ -55,12 +55,12 @@ class ImportDemandMatrices(object):
         free_matrix_no = all_numbers.difference(used_numbers)
 
         # Free Ganglinien NO
-        gang = Visum.Net.TimeSeriesCont.GetAll
+        gang = self.Visum.Net.TimeSeriesCont.GetAll
         all_gang = set(range(1, 25))
         used_gang = set([int(g.AttValue('No')) for g in gang])
         free_gang = all_gang.difference(used_gang)
 
-        f = Visum.Procedures.Functions
+        f = self.Visum.Procedures.Functions
         at = f.AnalysisTimes
 
         time_intervals = []
@@ -70,10 +70,11 @@ class ImportDemandMatrices(object):
             ti = at.TimeInterval(t + 1)
             time_intervals.append(ti)
 
-        codes = GetMulti(Visum.Net.Matrices, 'Code')
+        codes = GetMulti(self.Visum.Net.Matrices, 'Code')
 
-        zones_visum = Visum.Net.Zones.GetAll
-        zones_no_visum = numpy.array(GetMulti(Visum.Net.Zones, 'No')).astype('i4')
+        zones_visum = self.Visum.Net.Zones.GetAll
+        zones_no_visum = numpy.array(GetMulti(self.Visum.Net.Zones,
+                                              'No')).astype('i4')
 
         # Does Matrix exist?
         for z, ti in enumerate(time_intervals):
@@ -84,14 +85,12 @@ class ImportDemandMatrices(object):
             if not ovcode in codes:
                 # add Matrix
                 no = free_matrix_no.pop()
-                a = Visum.Net.AddMatrix(no)
+                a = self.Visum.Net.AddMatrix(no)
 
                 # Set DemandMatrix parameters
                 a.SetAttValue('Name', ovcode)
                 a.SetAttValue('Code', ovcode)
                 a.SetAttValue('MatrixType', 'MATRIXTYPE_DEMAND')
-
-            tablename = mode
 
             # Fill Matrix
             with tables.openFile(self.filepath, 'r') as h:
@@ -129,7 +128,7 @@ class ImportDemandMatrices(object):
                     # set Matrix
                     f = fromNumArray(tt_expanded, zones_visum)
                     values = f['datavalues']
-                    SetMatrix(Visum, ovcode, values)
+                    SetMatrix(self.Visum, ovcode, values)
 
                 except IndexError:
                     pass
@@ -137,52 +136,57 @@ class ImportDemandMatrices(object):
 
 
         # Ganglinien
-        tsc = Visum.Net.TimeSeriesCont.GetAll
+        tsc = self.Visum.Net.TimeSeriesCont.GetAll
         names = [t.AttValue('Name') for t in tsc]
 
         ganglinien_name = mode + 'Tagesgang'
         if not ganglinien_name in names:
             # create Ganglinie OVTagesgang
             no = free_gang.pop()
-            cont = Visum.Net.TimeSeriesCont
+            cont = self.Visum.Net.TimeSeriesCont
             DomainTypeMatrices = 1  # DomainType = MatrixGanglinie
-            ats = Visum.Net.AddTimeSeries(no, DomainTypeMatrices)  # Probleme bei Parameterübergabe
+            ats = self.Visum.Net.AddTimeSeries(no, DomainTypeMatrices)
             ats.SetAttValue('Name', ganglinien_name)
         else:
             # remove existing TimeSeriesItems
-            for ats in tsc:
-                if ats.AttValue('Name') == ganglinien_name:
-                    for a in ats.TimeSeriesItems:
-                        ats.RemoveTimeSeriesItem(a)
+            for ts in tsc:
+                if ts.AttValue('Name') == ganglinien_name:
+                    for a in ts.TimeSeriesItems:
+                        ts.RemoveTimeSeriesItem(a)
+                    ats = ts
 
 
-        matrices = Visum.Net.Matrices.GetAll
+        matrices = self.Visum.Net.Matrices.GetAll
 
         # Matrizen Zeitscheiben zuweisen
         for z, ti in enumerate(time_intervals):
-            if ti.AttValue('IsAggregate'):
-                continue
-            code = ti.AttValue('Code')
-            name = ti.AttValue('Name')
-            von = int(name[:2])
-            bis = int(name[4:6])
-            start = von * 60 * 60
-            end = bis * 60 * 60 -1
-            ovcode = '{m}_{ti}'.format(m=mode,
-                                       ti=code.encode("iso-8859-15"))
+            is_aggregate = ti.AttValue('IsAggregate')
+            valid_ti = self.is_valid_ti(is_aggregate)
+            if valid_ti:
+                code = ti.AttValue('Code')
+                name = ti.AttValue('Name')
+                von = int(name[:2])
+                bis = int(name[4:6])
+                start = von * 60 * 60
+                end = bis * 60 * 60 -1
+                ovcode = '{m}_{ti}'.format(m=mode,
+                                           ti=code.encode("iso-8859-15"))
 
-            m = getMatrixByCode(Visum, ovcode)
-            if m is not None:
-                m_no = int(m.AttValue('No'))
-                a1 = ats.AddTimeSeriesItem(start, end)
-                matrix_name = 'Matrix({})'.format(m_no)
-                a1.SetAttValue('Matrix', matrix_name)
+                m = getMatrixByCode(self.Visum, ovcode)
+                if m is not None:
+                    m_no = int(m.AttValue('No'))
+                    a1 = ats.AddTimeSeriesItem(start, end)
+                    matrix_name = 'Matrix({})'.format(m_no)
+                    a1.SetAttValue('Matrix', matrix_name)
 
+    def is_valid_ti(self, is_aggregate):
+        """Check if aggregate time intervals should be used or not"""
+        return not is_aggregate
 
 
 if __name__ == '__main__':
     import_matrices = ImportDemandMatrices(Visum)
-    import_matrices.import_arrays(mode='put')
+    import_matrices.import_arrays(mode='put', tablename='put')
 
 
 

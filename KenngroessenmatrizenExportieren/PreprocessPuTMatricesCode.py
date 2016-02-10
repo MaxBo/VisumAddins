@@ -25,11 +25,13 @@ import VisumPy
 from KenngroessenmatrizenExportierenBody import ExportSkims, NoSuchNodeError
 
 
-class PreprocessPuTMatrices(ExportSkims):
+class PreprocessMatrices(ExportSkims):
+    """Preprocess the Public Transport Matrices"""
+
 
     def __init__(self, Visum):
         self.Visum = Visum
-        super(PreprocessPuTMatrices, self).__init__(Visum)
+        super(PreprocessMatrices, self).__init__(Visum)
         pythonpath, project_folder = get_folders(Visum)
         self.pythonpath = pythonpath
         self.project_folder = project_folder
@@ -38,7 +40,7 @@ class PreprocessPuTMatrices(ExportSkims):
 
     def export_zones(self):
         """Exportiere die Verkehrszellendefinition"""
-        filepath = self.params['OV']
+        filepath = self.params[self.mode]
             # Open File
         with tables.openFile(filepath, 'a') as h:
             # Tabelle Bezirke
@@ -63,10 +65,11 @@ class PreprocessPuTMatrices(ExportSkims):
 
     def execute(self):
         project_xml_file = os.path.join(self.project_folder, 'project.xml')
-        cmd = '{pythonpath} -m tdmks.main -xml "{project_xml_file}" -n "{scenario_name}" --pp_put --skip_run'
+        cmd = '{pythonpath} -m tdmks.main -xml "{project_xml_file}" -n "{scenario_name}" {pp_cmd} --skip_run'
         full_cmd = cmd.format(pythonpath=self.pythonpath,
                               project_xml_file=project_xml_file,
                               scenario_name=self.scenario_name,
+                              pp_cmd=self.preprocess_command
                               )
         c = subprocess.Popen(full_cmd,
                              stdout=subprocess.PIPE,
@@ -74,9 +77,4 @@ class PreprocessPuTMatrices(ExportSkims):
                              shell=True)
         ret = c.stdout.read()
         return full_cmd
-
-if __name__ == '__main__':
-    preprocess_put_matrices = PreprocessPuTMatrices(Visum)
-    preprocess_put_matrices.export_zones()
-    preprocess_put_matrices.execute()
 

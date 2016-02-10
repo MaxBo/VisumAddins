@@ -83,21 +83,22 @@ class ExportSkims(object):
         'XADT': 'Erweiterte Anpassungszeit',
         'EJT': 'Reisezeitäquivalent',
         'DISC': 'Diskomfort durch Überlastung',
-
     }
+
+    mode = 'OV'
 
     def __init__(self, Visum):
         self.Visum = Visum
         self.scenario_name = self.Visum.Net.AttValue('ScenarioCode')
         self.params = get_params_from_visum(Visum,
                                             self.scenario_name,
-                                            ['OV'])
+                                            [self.mode])
 
     def export_arrays(self):
         """Export Array """
         AllMatrices = self.Visum.Net.Matrices.GetAll
         item = self.Visum.Net.AttValue('CURRENT_TIME_INTERVAL')
-        filepath = self.params['OV']
+        filepath = self.params[self.mode]
 
          # Open File
         with tables.openFile(filepath, 'a') as h:
@@ -118,7 +119,7 @@ class ExportSkims(object):
 
                     root = h.root
                     #Matrix als Numpy array (hat funktion shape)
-                    data = VisumPy.helpers.GetMatrix(Visum, no)
+                    data = VisumPy.helpers.GetMatrix(self.Visum, no)
 
                     #Knoten visum?
                     try:
@@ -132,12 +133,7 @@ class ExportSkims(object):
 
                     except NoSuchNodeError:
                         # Wenn nicht :
-                        m_shape = data.shape          # Get Shape
-                        m_row = m_shape[0]             # Get Row Number
-                        m_col = m_shape[1]              # Get Col Number
-                        n_time_sclices = self.Visum.Net.AttValue('NUM_OF_TIMESLICES')
-
-                        arr_shape = (n_time_sclices, m_row, m_col)
+                        arr_shape = self.get_shape(data)
 
 
                         #Create Array (here)
@@ -149,7 +145,9 @@ class ExportSkims(object):
 
                     # Fill table with Matrix
 
-                    table_in_hdf5[item] = data
+                    self.set_values(item=item,
+                                    data=data,
+                                    table_in_hdf5=table_in_hdf5)
 
                     #Meta Infos (Node)
                     table_in_hdf5.attrs['Name'] = hdf5_name
@@ -157,11 +155,20 @@ class ExportSkims(object):
                     date = time.asctime(t)
                     table_in_hdf5.attrs['Last Updated'] = date
 
-                    #Set Attributes (root)
-    ##                h.root._v_attrs['VISUM Version'] = inputdata
-
                     # Save
                     h.flush()
+
+    def set_values(self, item, data, table_in_hdf5):
+        table_in_hdf5[item] = data
+
+    def get_shape(self, data):
+        m_shape = data.shape          # Get Shape
+        m_row = m_shape[0]             # Get Row Number
+        m_col = m_shape[1]              # Get Col Number
+        n_time_sclices = self.Visum.Net.AttValue('NUM_OF_TIMESLICES')
+
+        arr_shape = (n_time_sclices, m_row, m_col)
+        return arr_shape
 
 
 
