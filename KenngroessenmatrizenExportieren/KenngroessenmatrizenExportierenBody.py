@@ -23,39 +23,81 @@ from helpers.latinize import latinize
 
 import numpy
 import tables
+from tables.exceptions import NoSuchNodeError
 import VisumPy
 import os
 import sys
 import time
-from latinze import latinize
 import VisumPy.AddIn
+from VisumPy.AddIn import AddIn, AddInState, AddInParameter
 
 from VisumPy.helpers import GetMatrix, SetMatrix
-from tables.exceptions import NoSuchNodeError
 
-# Zeitschiebe aus GUI
-class AddTimeSlices(object):
-    def __init__(self):
-        self.scenario_name = Visum.Net.AttValue('ScenarioCode')
+class ExportSkims(object):
+
+    visum2hdf_matrix_names = {
+        'IVDT(AST)': 'in_vehicle_distance_ast',
+        'IVDT(Bus)': 'in_vehicle_distance_bus',
+        'IVTT(AST)': 'in_vehicle_time_ast',
+        'IVTT(Bus)': 'in_vehicle_time_bus',
+        'JRT': 'Reisezeit',
+        'JRTA': 'Reisezeit angepasst',
+        'RIT': 'Beförderungszeit',
+        'RITA': 'Beförderungszeit angepasst',
+        'IVT': 'FahrzeitimFahrzeug',
+        'AXT': 'ÖV-Zusatz-Zeit',
+        'OWT': 'Startwartezeit',
+        'OWTA': 'Startwartezeit angepasst',
+        'TWT': 'Umsteigewartezeit',
+        'TWTA': 'Umsteigewartezeit angepasst',
+        'XTWT': 'Erweiterte Umsteigewartezeit',
+        'WOWT': 'Gewichtete Startwartezeit',
+        'WTWT': 'Gewichtete Umsteigewartezeit',
+        'WKT': 'Umsteigegehzeit',
+        'ACT': 'Zugangszeit',
+        'EGT': 'Abgangszeit',
+        'PJT': 'Empfundene Reisezeit',
+        'NTR': 'Umsteigehaufigkeit',
+        'XIMP': 'Erweiterter Widerstand',
+        'SFQ': 'Bedienungshaufigkeit',
+        'DID': 'Luftlinienweite',
+        'JRD': 'Reiseweite',
+        'RID': 'Beförderungsweite',
+        'IVD': 'Fahrweite',
+        'AXD': 'ÖV-Zusatz-Weite',
+        'WKD': 'Gehweite',
+        'ACD': 'Zugangsweite',
+        'EGD': 'Abgangsweite',
+        'JRS': 'Reisegeschwindigkeit',
+        'DIS': 'Luftliniengeschwindigkeit',
+        'FAR': 'Fahrpreis',
+        'NFZ': 'Anzahl Tarifzonen',
+        'NOC': 'Anzahl Betreiberwechsel',
+        'IVTD': 'Fahrtweite-VSys',
+        'IVTP': 'Fahrtweite-VSys [%]',
+        'IVTT': 'Fahrzeit im Fahrzeug-VSys',
+        'IPD': 'Widerstand',
+        'UTL': 'Nutzen',
+        'PLA': 'Attribut für Teilweg-Kenngröße',
+        'ADT': 'Anpassungszeit',
+        'XADT': 'Erweiterte Anpassungszeit',
+        'EJT': 'Reisezeitäquivalent',
+        'DISC': 'Diskomfort durch Überlastung',
+
+    }
+
+    def __init__(self, Visum):
+        self.Visum = Visum
+        self.scenario_name = self.Visum.Net.AttValue('ScenarioCode')
         self.params = get_params_from_visum(Visum,
                                             self.scenario_name,
                                             ['OV'])
-        self.export_arrays()
 
-        self.visum2hdf_matrix_names = {
-            'Fahrtweite-VSys(AST)': 'in_vehicle_distance_ast',
-            'Fahrtweite-VSys(Bus)': 'in_vehicle_distance_bus',
-            'Fahrzeit im Fahrzeug-VSys(AST)': 'in_vehicle_time_ast',
-            'Fahrzeit im Fahrzeug-VSys(Bus)': 'in_vehicle_time_bus',
-            'Fahrtweite': 'Fahrweite',
-            'Gehzeit': 'Umsteigegehzeit',
-            'Fahrzeit im Fahrzeug': 'FahrzeitimFahrzeug',
-        }
-
-    def export_arrays():
+    def export_arrays(self):
         """Export Array """
-        AllMatrices = Visum.Net.Matrices.GetAll
-        item = Visum.Net.AttValue('CURRENT_TIME_INTERVAL')
+        AllMatrices = self.Visum.Net.Matrices.GetAll
+        item = self.Visum.Net.AttValue('CURRENT_TIME_INTERVAL')
+        filepath = self.params['OV']
 
          # Open File
         with tables.openFile(filepath, 'a') as h:
@@ -70,8 +112,8 @@ class AddTimeSlices(object):
 
                     #Create/Open HDF5
                     name = latinize(m.AttValue('Name'))
-                    name = self.visum2hdf_matrix_names.get(name, name)
                     code = m.AttValue('Code')
+                    hdf5_name = self.visum2hdf_matrix_names.get(code, code)
                     no = m.AttValue('No')
 
                     root = h.root
@@ -86,14 +128,14 @@ class AddTimeSlices(object):
                     #addIn.ReportMessage(data)
                     try:
                         # Existiert der Knoten(Tabelle)
-                        table_in_hdf5 = h.getNode(group, name)
+                        table_in_hdf5 = h.getNode(group, hdf5_name)
 
                     except NoSuchNodeError:
                         # Wenn nicht :
                         m_shape = data.shape          # Get Shape
                         m_row = m_shape[0]             # Get Row Number
                         m_col = m_shape[1]              # Get Col Number
-                        n_time_sclices = Visum.Net.AttValue('NUM_OF_TIMESLICES')
+                        n_time_sclices = self.Visum.Net.AttValue('NUM_OF_TIMESLICES')
 
                         arr_shape = (n_time_sclices, m_row, m_col)
 
@@ -103,14 +145,14 @@ class AddTimeSlices(object):
 
                         # create Table (in hdf5 file)
                         ##arrname = code+str(t)
-                        table_in_hdf5 = h.createArray(group, name, arr)
+                        table_in_hdf5 = h.createArray(group, hdf5_name, arr)
 
                     # Fill table with Matrix
 
                     table_in_hdf5[item] = data
 
                     #Meta Infos (Node)
-                    table_in_hdf5.attrs['Name'] = name
+                    table_in_hdf5.attrs['Name'] = hdf5_name
                     t = time.localtime()
                     date = time.asctime(t)
                     table_in_hdf5.attrs['Last Updated'] = date
@@ -121,43 +163,11 @@ class AddTimeSlices(object):
                     # Save
                     h.flush()
 
-            # Tabelle Bezirke
-            try:
-                zonetable = h.getNode(h.root.Bezirke)
-                zonetable.remove()
-            except NoSuchNodeError:
-                pass
-            zones = Visum.Net.Zones
-            nummer = numpy.array(VisumPy.helpers.GetMulti(zones, 'No'))
-            name = numpy.array(VisumPy.helpers.GetMulti(zones, 'Name')).view(numpy.chararray).encode('cp1252')
-            rec = numpy.rec.fromarrays([nummer, name],
-                                       names=['zone_no',
-                                      'zone_name'],
-                                       titles=['Bezirke', 'BezirksNamen'],
-                                       formats=['<i4', 'S255'])
-            zonetable = h.createTable(h.root, 'Bezirke', rec)
 
-            h.flush()
 
-if len(sys.argv) > 1:
-    addIn = AddIn()
-else:
-    addIn = AddIn(Visum)
+if __name__ == '__main__':
+    export_skims = ExportSkims(Visum)
+    export_skims.export_arrays()
 
-if addIn.IsInDebugMode:
-    app = wx.PySimpleApp(0)
-    Visum = addIn.VISUM
-    addInParam = AddInParameter(addIn, None)
-else:
-    addInParam = AddInParameter(addIn, Parameter)
 
-if addIn.State != AddInState.OK:
-    addIn.ReportMessage(addIn.ErrorObjects[0].ErrorMessage)
-else:
-    try:
-        defaultParam = {}
 
-        param = addInParam.Check(True, defaultParam)
-        Run(param)
-    except:
-        addIn.HandleException(addIn.TemplateText.MainApplicationError)

@@ -17,6 +17,7 @@ import os
 import sys
 import time
 import VisumPy.AddIn
+from VisumPy.AddIn import AddIn, AddInState, AddInParameter
 from VisumPy.helpers import GetMatrix , SetMatrix, GetMulti, __getMatrixByCode
 
 from tables.exceptions import NoSuchNodeError
@@ -49,11 +50,10 @@ def Run(param):
 
     for t in xrange(at.NumTimeIntervals):
         ti = at.TimeInterval(t+1)
-        ##if not ti.AttValue('IsAggregate'):
+        #if not ti.AttValue('IsAggregate'):
         zeit.append(ti)
-        ##if ti.AttValue('IsAggregate'):
-            ##aggregate.append(ti.AttValue('Code'))
-
+        #else:
+            #aggregate.append(ti)
 
     codes = GetMulti(Visum.Net.Matrices, 'Code')
 
@@ -166,6 +166,7 @@ else:
         defaultParam = {}
 
         param = addInParam.Check(True, defaultParam)
+
         Run(param)
     except:
         addIn.HandleException(addIn.TemplateText.MainApplicationError)

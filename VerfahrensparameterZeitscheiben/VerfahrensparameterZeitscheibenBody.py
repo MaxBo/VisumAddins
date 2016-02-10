@@ -148,6 +148,7 @@ class AddTimeSlices(object):
                 self.add_operation_script()
                 n_time_sclices += 1
         Visum.Net.SetAttValue('NUM_OF_TIMESLICES', n_time_sclices)
+        self.add_operation_preprocess()
 
     def create_group_put_skim_matrix_calculation(self):
         OPERATIONTYPE_GROUP = 75
@@ -180,7 +181,6 @@ class AddTimeSlices(object):
         Add for each timeslice the operations
         """
         # modify xml-file
-        tmp_filename = tempfile.mktemp(suffix='.xml')
         filetype_ProcSettings = 12
         folder_ProcSettings = Visum.GetPath(filetype_ProcSettings)
         default_xml_file = os.path.join(folder_ProcSettings,
@@ -209,23 +209,30 @@ class AddTimeSlices(object):
 
     def add_operation_script(self):
         """Add Operation Script export matrices to hdf5"""
-        OPERATIONTYPE_SCRIPT = 65
-        #OPERATIONTYPE_ADDIN = 84
+        #OPERATIONTYPE_SCRIPT = 65
+        OPERATIONTYPE_ADDIN = 84
         operations = Visum.Procedures.Operations
         op = operations.AddOperation(self.position + 1)
-        op.SetAttValue('OperationType', OPERATIONTYPE_SCRIPT)
+        op.SetAttValue('OperationType', OPERATIONTYPE_ADDIN)
         op.SetAttValue('Code', 'OV_Skims')
         comment = 'Export Matrices to hdf5'
         op.SetAttValue('Comment', comment)
-        script_params = op.AddInParams
-        filename = os.path.join(self.appdata_visum_path,
-                                'AddIns',
-                                'GGR_Demand_Scripts',
-                                'export_put_skim_matrices_to_hdf5.py')
-        script_params.SetAttValue('FileName', filename)
+        addin_params = op.AddInParameters
+        addin_params.SetAttValue('AddInID', 'GGR_EXPORT_SKIMS_PUT')
         self.position += 1
 
-
+    def add_operation_preprocess(self):
+        """Add Operation Script Preprocess matrices to hdf5"""
+        OPERATIONTYPE_ADDIN = 84
+        operations = Visum.Procedures.Operations
+        op = operations.AddOperation(self.position + 1)
+        op.SetAttValue('OperationType', OPERATIONTYPE_ADDIN)
+        op.SetAttValue('Code', 'OV_Skims')
+        comment = 'Preprocess PuT Matrices in hdf5 file'
+        op.SetAttValue('Comment', comment)
+        addin_params = op.AddInParameters
+        addin_params.SetAttValue('AddInID', 'GGR_PREPROCESS_PUT_MATRICES')
+        self.position += 1
 
 if len(sys.argv) > 1:
     addIn = AddIn()

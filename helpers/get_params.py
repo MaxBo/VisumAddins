@@ -251,16 +251,19 @@ def validate_scenario(project_folder,
                          stderr=subprocess.STDOUT,
                          shell=True)
 
+    run = None
     line = c.stdout.readline().strip()
+    if line.startswith('no scenario selected'):
+        print(line)
+        return
+    if line.startswith('selected run:'):
+        run = line.split(':')[1]
+        line = c.stdout.readline().strip()
     if line.startswith('selected scenario:'):
         scenario = line.split(':')[1]
-    elif line.endswith('invalid'):
-        scenario = line.split(' ')[1]
-        msg = 'scenario {sc}: not all input validated yet'.format(sc=scenario)
-        print(msg)
     else:
         raise ValueError(fullcmd+line)
-    return scenario
+    return scenario, run
 
 def validate_scenario_from_visum(Visum, use_scenario_from_net=True):
     """
@@ -285,12 +288,12 @@ def validate_scenario_from_visum(Visum, use_scenario_from_net=True):
         scenario_name = None
 
     # validate if scenario exists and is valid, or create and select a scenario
-    scenario_name = validate_scenario(project_folder,
-                                      scenario_name,
-                                      pythonpath)
+    scenario_name, run = validate_scenario(project_folder,
+                                           scenario_name,
+                                           pythonpath)
 
     #Visum.Net.SetAttValue('ScenarioCode', scenario_name)
-    return scenario_name
+    return scenario_name, run
 
 
 if __name__ == '__main__':

@@ -25,21 +25,28 @@ def validate(Visum, use_scenario_from_net=True):
     # take scenario_name from Net Attributes if defined
     scenario_name = Visum.Net.AttValue('ScenarioCode')
     # validate the Scenario_name or create a new one
-    scenario_name = validate_scenario_from_visum(Visum, use_scenario_from_net)
+    scenario_name, run= validate_scenario_from_visum(Visum,
+                                                     use_scenario_from_net)
 
+    create_modifications(Visum, scenario_name, u'DemandScenarios',
+                         u'ScenarioCode')
+    create_modifications(Visum, run, u'DemandRuns', u'RunCode')
+
+def create_modifications(Visum, scenario_name, group, net_attribute ):
     # create a Scenario Modification (or define a new one)
     project = Visum.ScenarioManagement.CurrentProject
-    code = 'DemandScenario_{sc}'.format(sc=scenario_name)
+    code = '{group}_{sc}'.format(group=group, sc=scenario_name)
     modification = get_modification_by_code(project, code)
-    modification.SetAttValue('Group', 'DemandScenarios')
+
+    modification.SetAttValue('Group', group)
     # defnie the modification
     modification.StartEditModification()
-    Visum.Net.SetAttValue('ScenarioCode', scenario_name)
+    Visum.Net.SetAttValue(net_attribute, scenario_name)
     modification.EndEditModification()
     # set it to incompatible to other modifications in group "ScenarioNames"
     exclusions = []
     for m in project.Modifications:
-        if m.AttValue('Group') == u'DemandScenarios':
+        if m.AttValue('Group') == group:
             m_no = m.AttValue('No')
             if m_no != modification.AttValue('No'):
                 exclusions.append('{:0.0f}'.format(m_no))

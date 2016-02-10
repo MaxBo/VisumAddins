@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <VisumAddInCollection Format="1.0.0">
 		<VisumAddIn>
-			<AddInID>GGR_CALC_DEMAND</AddInID>
-			<AddInName>Nachfrage berechnen</AddInName>
+			<AddInID>GGR_PREPROCESS_PUT_MATRICES</AddInID>
+			<AddInName>ÖV-Matrizen vorberechnen</AddInName>
 			<AddInPath>GGR DEMAND</AddInPath>
-			<AddInBodyScript>NachfrageBerechnenBody.py</AddInBodyScript>
+			<AddInBodyScript>PreprocessPuTMatricesBody.py</AddInBodyScript>
 			<AddInOperation>true</AddInOperation>
 			<AddInAutoMenu>true</AddInAutoMenu>
 			<AddInAutoShowPara>true</AddInAutoShowPara>

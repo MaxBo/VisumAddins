@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <VisumAddInCollection Format="1.0.0">
 		<VisumAddIn>
-			<AddInID>GGR_CALCSAVESKIM</AddInID>
-			<AddInName>Kenngroessenmatrizen berechnen</AddInName>
+			<AddInID>GGR_EXPORT_SKIMS_PUT</AddInID>
+			<AddInName>Kenngroessenmatrizen ÖV Exportieren</AddInName>
 			<AddInPath>GGR DEMAND</AddInPath>
-			<AddInBodyScript>KenngroessenmatrizenBerechnenBody.py</AddInBodyScript>
+			<AddInBodyScript>KenngroessenmatrizenExportierenBody.py</AddInBodyScript>
 			<AddInOperation>true</AddInOperation>
 			<AddInAutoMenu>true</AddInAutoMenu>
 			<AddInAutoShowPara>true</AddInAutoShowPara>
