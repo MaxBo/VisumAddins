@@ -251,18 +251,19 @@ def validate_scenario(project_folder,
                          stderr=subprocess.STDOUT,
                          shell=True)
 
+    scenario = None
     run = None
-    line = c.stdout.readline().strip()
-    if line.startswith('no scenario selected'):
-        print(line)
-        return
-    if line.startswith('selected run:'):
-        run = line.split(':')[1]
-        line = c.stdout.readline().strip()
-    if line.startswith('selected scenario:'):
-        scenario = line.split(':')[1]
-    else:
-        raise ValueError(fullcmd+line)
+    lines = c.stdout.readlines()
+    for l in lines:
+        line = l.strip()
+        if line.startswith('no scenario selected'):
+            print(line)
+        if line.startswith('selected run:'):
+            run = line.split(':')[1]
+        if line.startswith('selected scenario:'):
+            scenario = line.split(':')[1]
+    if not scenario:
+        print('No Scenario found')
     return scenario, run
 
 def validate_scenario_from_visum(Visum, use_scenario_from_net=True):
