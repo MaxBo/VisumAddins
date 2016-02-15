@@ -6,7 +6,7 @@
 			<AddInPath>GGR DEMAND</AddInPath>
 			<AddInBodyScript>PreprocessPuTMatricesBody.py</AddInBodyScript>
 			<AddInOperation>true</AddInOperation>
-			<AddInAutoMenu>true</AddInAutoMenu>
+			<AddInAutoMenu>false</AddInAutoMenu>
 			<AddInAutoShowPara>true</AddInAutoShowPara>
 		</VisumAddIn>
 </VisumAddInCollection>
