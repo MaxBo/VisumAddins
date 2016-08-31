@@ -19,6 +19,7 @@ import subprocess
 import getpass
 import VisumPy.AddIn
 import tempfile
+from pywintypes import com_error
 
 
 # Zeitschiebe aus GUI
@@ -33,6 +34,15 @@ class AddTimeSlices(object):
         self.temp_xml = self.create_xml()
         self.appdata_visum_path = get_appdata_path(Visum)
         self.add_xml()
+
+    def get_xml_name(self):
+        """get the xml-Name from VISUM Net Attribute PUTSKIMPARAMETERXMLFILENAME
+        return ov_kgmatrix_operation.xml if attribute does not exists """
+        attname = 'PUTSKIMPARAMETERXMLFILENAME'
+        try:
+            xml_name = Visum.Net.AttValue('PUTSKIMPARAMETERXMLFILENAME')
+        except com_error AS e:
+            xml_name = 'ov_kgmatrix_operation.xml'
 
     def create_xml(self):
         """create time interval xml and import into Visum"""
@@ -183,8 +193,8 @@ class AddTimeSlices(object):
         # modify xml-file
         filetype_ProcSettings = 12
         folder_ProcSettings = Visum.GetPath(filetype_ProcSettings)
-        default_xml_file = os.path.join(folder_ProcSettings,
-                                        'ov_kgmatrix_operation.xml')
+        xml_name = self.get_xml_name()
+        default_xml_file = os.path.join(folder_ProcSettings, xml_name)
 
         # insert operation at given position
         ReadOperations_Insert = 2
