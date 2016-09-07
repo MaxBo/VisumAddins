@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<VisumAddInCollection Format="1.0.0">
+    <VisumAddIn>
+        <AddInID>GGR_RESET_DEMAND</AddInID>
+        <AddInName>Reset Home Demand in Destination and Mode Choice Model</AddInName>
+        <AddInPath>GGR KIEL</AddInPath>
+        <AddInBodyScript>reset_home_demand.py</AddInBodyScript>
+        <AddInOperation>true</AddInOperation>
+        <AddInAutoMenu>true</AddInAutoMenu>
+        <AddInAutoShowPara>false</AddInAutoShowPara>
+    </VisumAddIn>
+</VisumAddInCollection>

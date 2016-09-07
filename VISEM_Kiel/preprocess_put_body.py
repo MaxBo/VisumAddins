@@ -10,12 +10,35 @@ def main(Visum):
     dm = Visum.Net.DemandModels.ItemByKey(code)
 
     add_pjt_by_activity(dm)
+    calculate_min_ticket_price()
+
+
+def calculate_min_ticket_price():
+    """Calculate the minimum Ticket price over the whole day"""
+    n_zones = Visum.Net.Zones.Count
+    far_matrices = Visum.Net.Matrices.ItemsByRef('Matrix([CODE]="FAR")')
+    far_attrs = np.rec.fromrecords(
+        far_matrices.GetMultipleAttributes(('CODE', 'FROMTIME', 'TOTIME', 'NO')),
+        names=['code', 'fromtime', 'totime', 'no'])
+
+    res = np.zeros((n_zones, n_zones), dtype='d')
+    for m in far_attrs:
+        # only matrices with fromtime-value
+        if not m['fromtime'] is None:
+            values = np.array(Visum.Net.Matrices.ItemByKey(m['no']))
+            res = np.minimum(res, values)
+
+    masked_res = np.ma.masked_equal(res, 0, copy=False)
+    min_price = np.minimum(masked_res.min(0), masked_res.min(1))
+    np.fill_diagonal(res, min_price)
+
+    ref = 'Matrix([CODE]="SINGLETICKET")'
+    res_matrix = Visum.Net.Matrices.ItemsByRef(ref).GetAll[0]
+    res_matrix.SetValues(res)
 
 
 def add_pjt_by_activity(dm2, skim='PJT', home='W'):
     """Add weighted PT Skim Matrices"""
-    #AUTONUMBER = -1
-    #OBJECTTYPEREF_ZONE = 2
     ref = 'Matrix([CODE]="No_Connection_Forward")'
     nc_forward = Visum.Net.Matrices.ItemsByRef(ref).GetAll[0]
     ref = 'Matrix([CODE]="No_Connection_Backward")'
@@ -99,50 +122,6 @@ def set_no_connection_formula(ap_code, dm2, pgr,
     complete_formula = '1 / ((1/999999) + {})'.format('\n+'.join(matrices))
     nc_forward.SetAttValue('Formula', complete_formula)
     return weights
-
-
-#def weight_pt_matrix_with_time_series(dm2, ap_code):
-    #"""
-    #Add weighted PT Skim Matrix with skim matrix for activity pair ap_code
-    #"""
-    #AUTONUMBER = -1
-    #OBJECTTYPEREF_ZONE = 2
-
-    #weights = get_weights(ap_code, dm2, pgr)
-
-    #matrices = [formula.format(f=ti['start'], t=ti['end'], w=w)
-                #for ti, w in zip(time_intervals, weights)]
-    #complete_formula = '1 / ((1/999999) + {})'.format('\n+'.join(matrices))
-
-    #md = Visum.Net.AddMatrixWithFormula(No=AUTONUMBER,
-                                        #formula=complete_formula,
-                                        #objectTypeRef=OBJECTTYPEREF_ZONE)
-    #nc = 'NoConnect_{}'.format(ap_code)
-    #md.SetAttValue('Code', nc)
-    #md.SetAttValue('Name', 'No connection for {} trips'.format(ap_code))
-    #md.SetAttValue('DataSourceType', 'FORMULA')
-    #md.SetAttValue('ModeCode', 'O')
-    #md.SetAttValue('MatrixType', u'MATRIXTYPE_SKIM')
-
-    #matrices2 = [formula2.format(f=ti['start'], t=ti['end'], w=w)
-                 #for ti, w in zip(time_intervals, weights)]
-    #complete_formula = '''
-#IF((Matrix([CODE]="{nc}")<999999),
-#Matrix([CODE]="{nc}")* ({f}),
-#999999)'''.format(nc=nc,
-                  #f='\n+'.join(matrices2))
-
-    #md = Visum.Net.AddMatrixWithFormula(No=AUTONUMBER,
-                                        #formula=complete_formula,
-                                        #objectTypeRef=OBJECTTYPEREF_ZONE)
-
-    #mc = 'PJT_{}'.format(ap_code)
-    #md.SetAttValue('Code', mc)
-    #md.SetAttValue('Name',
-                   #'Percieved Jourey Time for {} trips'.format(ap_code))
-    #md.SetAttValue('DataSourceType', 'FORMULA')
-    #md.SetAttValue('MatrixType', u'MATRIXTYPE_SKIM')
-    #md.SetAttValue('ModeCode', 'O')
 
 
 def get_weights(ap_code, dm2, pgr):

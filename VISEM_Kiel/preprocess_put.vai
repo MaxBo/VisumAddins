@@ -4,8 +4,8 @@
 			<AddInID>GGR_PREPROCESS_PUT_SKIMS</AddInID>
 			<AddInName>Calculate activity specific PuT Skim Matrices</AddInName>
 			<AddInPath>GGR KIEL</AddInPath>
-			<AddInBodyScript>PreprocessPuT_Body.py</AddInBodyScript>
-			<AddInOperation>false</AddInOperation>
+			<AddInBodyScript>preprocess_put_body.py</AddInBodyScript>
+			<AddInOperation>true</AddInOperation>
 			<AddInAutoMenu>true</AddInAutoMenu>
 			<AddInAutoShowPara>false</AddInAutoShowPara>
 		</VisumAddIn>
