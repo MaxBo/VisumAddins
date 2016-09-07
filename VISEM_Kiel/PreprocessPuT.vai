@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<VisumAddInCollection Format="1.0.0">
+		<VisumAddIn>
+			<AddInID>GGR_PREPROCESS_PUT_SKIMS</AddInID>
+			<AddInName>Calculate activity specific PuT Skim Matrices</AddInName>
+			<AddInPath>GGR KIEL</AddInPath>
+			<AddInBodyScript>PreprocessPuT_Body.py</AddInBodyScript>
+			<AddInOperation>false</AddInOperation>
+			<AddInAutoMenu>true</AddInAutoMenu>
+			<AddInAutoShowPara>false</AddInAutoShowPara>
+		</VisumAddIn>
+</VisumAddInCollection>
