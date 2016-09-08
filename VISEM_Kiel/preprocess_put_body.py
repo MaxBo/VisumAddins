@@ -86,6 +86,7 @@ Matrix([CODE]="{nc}")* 0.5 * ({f}),
             weighted_skim_matrix.SetAttValue('Formula', complete_formula)
 
             e = np.array(weighted_skim_matrix.GetValues())
+            np.fill_diagonal(e, 999999)
             m.SetValues(e)
 
 
