@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<VisumAddInCollection Format="1.0.0">
+		<VisumAddIn>
+			<AddInID>GGR_PREPROCESS_TARIF_SKIMS</AddInID>
+			<AddInName>Calculate Fare Skim Matrices</AddInName>
+			<AddInPath>GGR KIEL</AddInPath>
+			<AddInBodyScript>preprocess_tarif_body.py</AddInBodyScript>
+			<AddInOperation>true</AddInOperation>
+			<AddInAutoMenu>true</AddInAutoMenu>
+			<AddInAutoShowPara>false</AddInAutoShowPara>
+		</VisumAddIn>
+</VisumAddInCollection>
