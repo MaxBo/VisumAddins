@@ -11,6 +11,8 @@ def main(Visum):
 
 def calculate_min_ticket_price():
     """Calculate the minimum Ticket price over the whole day"""
+    AUTONUMBER = -1
+    OBJECTTYPEREF_ZONE = 2
     n_zones = Visum.Net.Zones.Count
     far_matrices = Visum.Net.Matrices.ItemsByRef('Matrix([CODE]="FAR")')
     far_attrs = np.rec.fromrecords(
@@ -29,6 +31,16 @@ def calculate_min_ticket_price():
     np.fill_diagonal(res, min_price)
 
     ref = 'Matrix([CODE]="SINGLETICKET")'
+    ticket_matrices = Visum.Net.Matrices.ItemsByRef(ref).GetAll
+    if not ticket_matrices:
+        m = Visum.Net.AddMatrix(
+            No=AUTONUMBER,
+            objectTypeRef=OBJECTTYPEREF_ZONE)
+        m.SetAttValue('Code', u'SINGLETICKET')
+        m.SetAttValue('Name', u'SINGLETICKET')
+        m.SetAttValue('MatrixType', 'MATRIXTYPE_SKIM')
+
+
     res_matrix = Visum.Net.Matrices.ItemsByRef(ref).GetAll[0]
     res_matrix.SetValues(res)
 
