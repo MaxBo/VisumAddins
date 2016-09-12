@@ -28,15 +28,27 @@ def aggregate_generation_groups_to_dm_groups(dm_name1='VisemGeneration',
     pgr2_codes = np.rec.fromrecords(pgr2.GetMultipleAttributes(['code']),
                                     names=['code'])
 
-    attrs2 = ['NumPersons({})'.format(d[0]) for d in pgr2_codes]
-    arr = np.zeros((zones.Count, pgr2.Count), dtype='f8')
-    dt = np.dtype({'names': attrs2,
-                   'formats': ['f8' for i in range(pgr2.Count)]})
-    ra2 = arr.ravel().view(type=np.recarray, dtype=dt)
+    unique_pg2 = np.unique(pgr_codes['GroupDestMode'])
+    ra_unique_pg2 = np.rec.fromarrays((
+        np.zeros((len(zones)), dtype='f8') for i in range(len(unique_pg2))),
+        names=unique_pg2.tolist(),
+        formats=['f8'] * len(unique_pg2))
+
     for i, d in enumerate(pgr_codes):
         detailed_column = 'NumPersons({})'.format(d['code'])
-        aggregated_column = 'NumPersons({})'.format(d['GroupDestMode'])
-        ra2[aggregated_column] += ra[detailed_column]
+        aggregated_column = d['GroupDestMode']
+        ra_unique_pg2[aggregated_column] += ra[detailed_column]
+
+        attrs2 = ['NumPersons({})'.format(d[0]) for d in pgr2_codes]
+        arr = np.zeros((zones.Count, pgr2.Count), dtype='f8')
+        dt = np.dtype({'names': attrs2,
+                       'formats': ['f8' for i in range(pgr2.Count)]})
+        ra2 = arr.ravel().view(type=np.recarray, dtype=dt)
+
+        for i, d in enumerate(pgr2_codes):
+            group_column = d['code'].split('_')[0]
+            aggregated_column = 'NumPersons({})'.format(d['code'])
+            ra2[aggregated_column] = ra_unique_pg2[group_column]
 
     zones.SetMultipleAttributes(attrs2, ra2)
 
