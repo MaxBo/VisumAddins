@@ -12,7 +12,7 @@ def main(Visum):
     add_pjt_by_activity(dm)
 
 
-def add_pjt_by_activity(dm2, skim='PJT', home='W'):
+def add_pjt_by_activity(dm2, skim='PJT', home='W', factor=.8, exponent=.8):
     """Add weighted PT Skim Matrices"""
     ref = 'Matrix([CODE]="No_Connection_Forward")'
     nc_forward = Visum.Net.Matrices.ItemsByRef(ref).GetAll[0]
@@ -27,7 +27,8 @@ def add_pjt_by_activity(dm2, skim='PJT', home='W'):
     formula = '{w} * (Matrix([CODE] = "PJT" & [FROMTIME]={f} & [TOTIME]={t}) < 99999)'
     formula2 = '''
 {w} * IF((Matrix([CODE] = "PJT" & [FROMTIME]={f} & [TOTIME]={t}) < 99999),
-Matrix([CODE] = "PJT" & [FROMTIME]={f} & [TOTIME]={t}), 0)'''
+Matrix([CODE] = "PJT" & [FROMTIME]={f} & [TOTIME]={t}) +
+{factor} * POW((Matrix([CODE] = "XADT" & [FROMTIME]={f} & [TOTIME]={t}) * 4 + 1),{exponent}), 0)'''
 
     formula_one_way = '''
 IF((Matrix([CODE]="{nc}")<999999),
@@ -66,14 +67,16 @@ Matrix([CODE]="{nc}")* 0.5 * ({f}),
             # set the weighted_skim_matrix
 
             # forward
-            matrices2 = [formula2.format(f=ti['start'], t=ti['end'], w=w)
+            matrices2 = [formula2.format(f=ti['start'], t=ti['end'], w=w,
+                                         factor=factor, exponent=exponent)
                          for ti, w in zip(time_intervals, weights_forward)]
             formula_forward = formula_one_way.format(
                 nc='No_Connection_Forward',
                 f='\n+'.join(matrices2))
 
             # backward
-            matrices2 = [formula2.format(f=ti['start'], t=ti['end'], w=w)
+            matrices2 = [formula2.format(f=ti['start'], t=ti['end'], w=w,
+                                         factor=factor, exponent=exponent)
                          for ti, w in zip(time_intervals, weights_backward)]
             formula_backward = formula_one_way.format(
                 nc='No_Connection_Backward',
