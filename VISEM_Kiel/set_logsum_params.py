@@ -64,7 +64,7 @@ def get_hierarchy(dm):
     return h
 
 
-def get_operation(Visum, OP_TYPE, N=1):
+def get_or_add_operation(Visum, OP_TYPE, N=1):
     """
     search the Nth operation of OP_Type
 
