@@ -39,8 +39,8 @@ def add_parking_by_activity(dm, skim='PARKING', home='W'):
     for act in acts:
         if act.AttValue('IsHomeActivity'):
             if addIn.ExecutionCanceled:
-                raise RuntimeError('Aborted at DS {i}'.format(i=i))       
-            addIn.UpdateProgressDialog(i, 'Calculate Parking at Home'.decode("iso-8859-15"))
+                raise RuntimeError('Aborted at Activity {i}'.format(i=i))       
+            addIn.UpdateProgressDialog(i, u'Calculate Parking at Home')
             
             for z, p in enumerate(different_park_zones):
                 park_costs_home[z] = \
@@ -54,7 +54,7 @@ def add_parking_by_activity(dm, skim='PARKING', home='W'):
             a_code = act.AttValue('Code')
             a_name = act.AttValue('Name')
             if addIn.ExecutionCanceled:
-                raise RuntimeError('Aborted at DS {i}'.format(i=i))       
+                raise RuntimeError('Aborted at Activity {i}'.format(i=i))       
             addIn.UpdateProgressDialog(i, u'Calculate Matrix PARKING_{a} for {b}'.format(
                 a=a_code, b=a_name))
             
@@ -69,10 +69,10 @@ def add_parking_by_activity(dm, skim='PARKING', home='W'):
                 raise ValueError(ref)
             m.SetValues(total_costs)
 
-    addIn.ReportMessage('calculated Parking Matrices for {i} activities'.format(i=i).decode("iso-8859-15"),
-                        messageType=2)
     addIn.UpdateProgressDialog(n_activities)
     addIn.CloseProgressDialog()
+    addIn.ReportMessage(u'calculated Parking Matrices for {i} activities'.format(i=i),
+                        messageType=2)
 
 
 if __name__ == '__main__':

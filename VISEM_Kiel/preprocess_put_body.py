@@ -1,18 +1,25 @@
 # -*- coding: utf-8 -*-
 
 
+import sys
+
+if __package__ is None:
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
 import numpy as np
+from helpers.visumpy_with_progress_dialog import AddIn, AddInState
 
 
-def main(Visum):
+def main(Visum, addIn):
     """"""
     code = 'VisemT'
     dm = Visum.Net.DemandModels.ItemByKey(code)
 
-    add_pjt_by_activity(dm)
+    add_pjt_by_activity(dm, addIn)
 
 
-def add_pjt_by_activity(dm2, skim='PJT', home='W', factor=.8, exponent=.8):
+def add_pjt_by_activity(dm2, addIn, skim='PJT', home='W', factor=.8, exponent=.8):
     """Add weighted PT Skim Matrices"""
     ref = 'Matrix([CODE]="No_Connection_Forward")'
     nc_forward = Visum.Net.Matrices.ItemsByRef(ref).GetAll[0]
@@ -36,13 +43,24 @@ Matrix([CODE]="{nc}")* 0.5 * ({f}),
 999999)'''
 
     acts = dm2.Activities.GetAll
-    for act in acts:
+    n_activities = len(acts)
+    addIn.ShowProgressDialog(
+        u"Calculate Percieved Journey Time Matrices for {N} Activities".format(N=n_activities),
+        "Calculate Percieved Journey Time Matrices", n_activities * 10, setTimeMode=True)
+    
+    for i, act in enumerate(acts):
+        c = i * 10
+        
         if not act.AttValue('IsHomeActivity'):
             a_code = act.AttValue('Code')
-
+            a_name = act.AttValue('Name')
+            progress(addIn, c, a_name, a_code)
             # get the target matrix
             ref = 'Matrix([CODE]="{}_{}")'.format(skim, a_code)
             m = Visum.Net.Matrices.ItemsByRef(ref).GetAll[0]
+            
+            c += 1
+            progress(addIn, c, a_name, a_code)
 
             # set the no_connection_formula for the forward trips
             ap_code = '{h}{a}'.format(h=home, a=a_code)
@@ -63,6 +81,9 @@ Matrix([CODE]="{nc}")* 0.5 * ({f}),
                 formula,
                 time_intervals,
                 nc_backward)
+
+            c += 1
+            progress(addIn, c, a_name, a_code)
 
             # set the weighted_skim_matrix
 
@@ -88,9 +109,26 @@ Matrix([CODE]="{nc}")* 0.5 * ({f}),
 
             weighted_skim_matrix.SetAttValue('Formula', complete_formula)
 
+            c += 1
+            progress(addIn, c, a_name, a_code)
+
             e = np.array(weighted_skim_matrix.GetValues())
+            
+            c += 3
+            progress(addIn, c, a_name, a_code)            
             np.fill_diagonal(e, 999999)
             m.SetValues(e)
+
+    addIn.UpdateProgressDialog(n_activities)
+    addIn.CloseProgressDialog()
+    addIn.ReportMessage(u'calculated Parking Matrices for {i} activities'.format(i=i),
+                        messageType=2)
+
+def progress(addIn, c, a_name, a_code):
+    if addIn.ExecutionCanceled:
+        raise RuntimeError('Aborted at Activity {i}'.format(i=i))       
+    addIn.UpdateProgressDialog(c, u'Calculate Matrix PJT_{a} for {b}'.format(
+        a=a_code, b=a_name))        
 
 
 def set_no_connection_formula(ap_code, dm2, pgr,
@@ -133,4 +171,16 @@ def get_time_intervals():
 
 
 if __name__ == '__main__':
-    main(Visum)
+    if len(sys.argv) > 1:
+        addIn = AddIn()
+    else:
+        addIn = AddIn(Visum)    
+        
+    if addIn.State != AddInState.OK:
+        addIn.ReportMessage(addIn.ErrorObjects[0].ErrorMessage)
+    else:
+        try:            
+            main(Visum, addIn)
+        except:
+            addIn.HandleException(addIn.TemplateText.MainApplicationError)
+

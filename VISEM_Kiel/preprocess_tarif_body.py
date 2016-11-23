@@ -1,15 +1,22 @@
 # -*- coding: utf-8 -*-
 
 
+import sys
+
+if __package__ is None:
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
 import numpy as np
+from helpers.visumpy_with_progress_dialog import AddIn, AddInState
 
 
-def main(Visum):
+def main(Visum, addIn):
     """"""
-    calculate_min_ticket_price()
+    calculate_min_ticket_price(addIn)
 
 
-def calculate_min_ticket_price():
+def calculate_min_ticket_price(addIn):
     """Calculate the minimum Ticket price over the whole day"""
     AUTONUMBER = -1
     OBJECTTYPEREF_ZONE = 2
@@ -43,7 +50,20 @@ def calculate_min_ticket_price():
 
     res_matrix = Visum.Net.Matrices.ItemsByRef(ref).GetAll[0]
     res_matrix.SetValues(res)
+    addIn.ReportMessage(u'calculated Fare Matrices',
+                        messageType=2)
 
 
 if __name__ == '__main__':
-    main(Visum)
+    if len(sys.argv) > 1:
+        addIn = AddIn()
+    else:
+        addIn = AddIn(Visum)    
+        
+    if addIn.State != AddInState.OK:
+        addIn.ReportMessage(addIn.ErrorObjects[0].ErrorMessage)
+    else:
+        try:            
+            main(Visum, addIn)
+        except:
+            addIn.HandleException(addIn.TemplateText.MainApplicationError)
