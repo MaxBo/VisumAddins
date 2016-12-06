@@ -56,10 +56,13 @@ def calibrate_demand_model(dm, addIn,
                         print('{ms:.2f}%'.format(ms=modelled_ms*100))
                         target = mode.AttValue(
                             'TARGET_MODAL_SPLIT_{g}'.format(g=group))
-                        print('{ms:.2f}%'.format(ms=target*100))
-                        addIn.ReportMessage(u'mode {m}: modelled: {ms:.2f}%, target: {ts:.2f}%'.format(
-                            m=mode_name, ms=modelled_ms*100, ts=target*100), 
-                                            messageType=2)                
+                        if target > 0:
+                            print('{ms:.2f}%'.format(ms=target*100))
+                            addIn.ReportMessage(u'mode {m}: modelled: {ms:.2f}%, target: {ts:.2f}%'.format(
+                                m=mode_name, ms=modelled_ms*100, ts=target*100), 
+                                                messageType=2)
+                        else:
+                            continue
                         if modelled_ms > 0:
                             attname = 'Const_{m}_{g}'.format(m=mode_name,
                                                              g=group)
