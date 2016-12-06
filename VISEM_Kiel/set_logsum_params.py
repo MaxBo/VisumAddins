@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 
 
+import sys
+
+if __package__ is None:
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
 import numpy as np
+from helpers.visumpy_with_progress_dialog import AddIn, AddInState
 
 
-def main(Visum):
+def main(Visum, addIn):
     """"""
     code = 'VisemT'
     dm = Visum.Net.DemandModels.ItemByKey(code)
-    set_logsum_params(dm)
+    set_logsum_params(dm, addIn)
 
 
-def set_logsum_params(dm):
+def set_logsum_params(dm, addIn):
 
     VISEM_COMBINED = 85
 
@@ -30,19 +37,41 @@ def set_logsum_params(dm):
         if not act.AttValue('IsHomeActivity'):
             ls_param = Visum.Net.AttValue('LS_{}'.format(a))
             ls_dict[a] = ls_param
+            
+    n_demand_strata = dm.DemandStrata.Count
+
+    addIn.ShowProgressDialog(
+        u"Set Logsum for {N} Demand Strata".format(N=n_demand_strata),
+        u"Set Logsum", n_demand_strata, setTimeMode=True)
 
     # Distribution Parameters by Group
+    i = 0
     for ds in dm.DemandStrata:
+        i += 1
+        if addIn.ExecutionCanceled:
+            raise RuntimeError(u'Aborted at Demand Stratum {i}'.format(i=i))       
+
+        calibrate = ds.AttValue('Autocalibrate_Logsum')
         pg_code = ds.AttValue('PersonGroupCodes')
         ac_code = ds.AttValue('ActivityChainCode')
+        addIn.UpdateProgressDialog(
+            i, u'Set Logsum {i} for {p}:{a}'.format(i=i, p=pg_code, a=ac_code))
+
         main_activity = get_main_activity(hierarchy, ac_code)
         vgdist_para = vdist_para.VISEMDGroupDistributionParameters(pg_code)
         for a in ac_code[1:-1]:
-            vgadist_para = vgdist_para.VISEMDGroupActivityDistributionParameters(a)
-            ls_param = ls_dict[a]
+            if calibrate or a != main_activity:
+                vgadist_para = vgdist_para.VISEMDGroupActivityDistributionParameters(a)
+                ls_param = ls_dict[a]
+    
+                vgadist_para.SetAttValue('LogSumCoeff', ls_param)
+                # hiermit wird der Parameter in der Nutzenfunktion verändert
 
-            vgadist_para.SetAttValue('LogSumCoeff', ls_param)
-            # hiermit wird der Parameter in der Nutzenfunktion verändert
+
+    addIn.UpdateProgressDialog(n_demand_strata)
+    addIn.CloseProgressDialog()
+    addIn.ReportMessage(u'Set Logsum for {i} Demand Strata'.format(i=i),
+                        messageType=2)
 
 
 def get_main_activity(hierarchy, ac_code):
@@ -92,4 +121,15 @@ def get_or_add_operation(Visum, OP_TYPE, N=1):
 
 
 if __name__ == '__main__':
-    main(Visum)
+    if len(sys.argv) > 1:
+        addIn = AddIn()
+    else:
+        addIn = AddIn(Visum)    
+        
+    if addIn.State != AddInState.OK:
+        addIn.ReportMessage(addIn.ErrorObjects[0].ErrorMessage)
+    else:
+        try:            
+            main(Visum, addIn)
+        except:
+            addIn.HandleException(addIn.TemplateText.MainApplicationError)
