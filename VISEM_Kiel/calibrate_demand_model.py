@@ -29,13 +29,41 @@ def calibrate_demand_model(dm, addIn,
     target_modal_split = np.rec.array(
         modes.GetMultipleAttributes(cols), names=cols)
     
+    # define group definitions, start with car_availability as "hard margin"
     group_definitions = ['car_availability', 'occupation']
+    # init groups
     groups = {}
+    total_trips_mode = {}
     
-    for gd in group_definitions:
+    # loop over group definitions
+    for g, gd in enumerate(group_definitions):
+        # get groups in group_type
         groups[gd] = np.unique(
             [a[1] 
              for a in dm.PersonGroups.GetMultiAttValues(gd)])
+        # loop over groups to sum up the trips by mode for the non-primary groups
+        adjustment_factor = {}
+        if g > 0:
+            trips_mode_group = {}    
+            for group in groups[gd]:
+                if group and group <> 'NULL':    
+                    for mode in modes:
+                        is_demand = mode.AttValue('DemandMode')
+                        if is_demand:
+                            mode_code = mode.AttValue('Code')
+                            trips_group_mode = '_'.join([trips_group, mode_code])
+                            trips_mode = Visum.Net.AttValue(trips_group_mode)
+                            trips_mode_group = trips_mode_group.get(mode_code, 0) + trips_mode
+            # calculate adjustment factor for group definitions                
+            for mode in modes:
+                is_demand = mode.AttValue('DemandMode')
+                if is_demand:
+                    mode_code = mode.AttValue('Code')
+                    mode_name = mode.AttValue('Name_Coeff')
+                    adjustment_factor[mode_code] = total_trips_mode[mode] / trips_mode_group[mode_code]
+
+                    
+        # loop over groups
         for group in groups[gd]:
             if group and group <> 'NULL':
                 print(group)
@@ -52,14 +80,20 @@ def calibrate_demand_model(dm, addIn,
                         print(mode_name)
                         trips_group_mode = '_'.join([trips_group, mode_code])
                         trips_mode = Visum.Net.AttValue(trips_group_mode)
-                        modelled_ms = trips_mode/total_trips
-                        print('{ms:.2f}%'.format(ms=modelled_ms*100))
-                        target = mode.AttValue(
+                        # for first group: set target trips for mode
+                        if g == 0:
+                            total_trips_mode[mode] = total_trips_mode.get(mode, 0) + trips_mode
+
+                        modelled_ms = trips_mode / total_trips
+                        print('{ms:.2f}%'.format(ms=modelled_ms * 100))
+                        target_ms = mode.AttValue(
                             'TARGET_MODAL_SPLIT_{g}'.format(g=group))
-                        if target > 0:
-                            print('{ms:.2f}%'.format(ms=target*100))
-                            addIn.ReportMessage(u'mode {m}: modelled: {ms:.2f}%, target: {ts:.2f}%'.format(
-                                m=mode_name, ms=modelled_ms*100, ts=target*100), 
+                        adjusted_target_ms = target_ms * adjustment_factor.get(mode_code, 1.)
+                        target = adjusted_target_ms * total_trips 
+                        if adjusted_target_ms > 0:
+                            print('{ms:.2f}%'.format(ms=target_ms * 100))
+                            addIn.ReportMessage(u'mode {m}: modelled: {ms:.2f}%, target_ms: {ts:.2f}%, adjusted_target: {at:.2f}'.format(
+                                m=mode_name, ms=modelled_ms*100, ts=target_ms * 100, at=adjusted_target_ms * 100), 
                                                 messageType=2)
                         else:
                             continue
@@ -69,7 +103,7 @@ def calibrate_demand_model(dm, addIn,
                             print(attname)
                             coeff = Visum.Net.AttValue(attname)
                             print('coeff: {d:.2f}'.format(d=coeff))
-                            diff = np.log(target/modelled_ms)
+                            diff = np.log(adjusted_target_ms / modelled_ms)
                             print('change: {d:.2f}'.format(d=diff))
                             coeff_new = coeff + (diff * attenuation)
                             addIn.ReportMessage(u'mode {m}: before: {b:.2f}, after: {a:.2f}'.format(
