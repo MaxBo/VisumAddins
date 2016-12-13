@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<VisumAddInCollection Format="1.0.0">
+    <VisumAddIn>
+        <AddInID>GGR_DELETE_DEMAND_STRATA</AddInID>
+        <AddInName>Delete All Demand Strata</AddInName>
+        <AddInPath>GGR KIEL</AddInPath>
+        <AddInBodyScript>delete_all_demand_strata.py</AddInBodyScript>
+        <AddInOperation>true</AddInOperation>
+        <AddInAutoMenu>true</AddInAutoMenu>
+        <AddInAutoShowPara>false</AddInAutoShowPara>
+    </VisumAddIn>
+</VisumAddInCollection>
