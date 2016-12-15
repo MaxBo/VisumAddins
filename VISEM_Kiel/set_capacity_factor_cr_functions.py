@@ -13,21 +13,36 @@ from helpers.visumpy_with_progress_dialog import AddIn, AddInState
 def main(Visum, capacityFactor, addIn):
     """"""
     crs = Visum.Procedures.Functions.CRFunctions
-    n_cr_functions = 54
+    linkTypeList = Visum.Lists.CreateLinkTypeList
+    linkTypeList.AddColumn("VDFunction\VdFunctionNumber",GroupOrAggrFunction=1) # Group column
+    linkTypeList.AddColumn("No",GroupOrAggrFunction=9)                          # aggregate : count
+    linkTypeList.AddColumn("No",GroupOrAggrFunction=10)                         # aggregate: concatenate
+    
+    crFuncUsage = linkTypeList.SaveToArray()
+    
+
+    n_cr_functions = len(crFuncUsage)
     
     addIn.ShowProgressDialog(
         u"Set CR Capacity Factors",
         u"Set CR Capacity Factors", n_cr_functions, setTimeMode=True)
-    for i in range(1, n_cr_functions):
+    for i, crFunc in enumerate(crFuncUsage):
+        cr_type =  int(crFunc[0])
+        used_in = int(crFunc[1])
+        ref_link_types = crFunc[2]
+        if isinstance(ref_link_types, float):
+            ref_link_types = str(int(ref_link_types))
         if addIn.ExecutionCanceled:
             raise RuntimeError(u'Aborted at Linktype {i}'.format(i=i))       
-        cr = crs.CrFunction(i)
+        cr = crs.CrFunction(cr_type)
         cr.SetAttValue('capacityFactor', capacityFactor)
         addIn.UpdateProgressDialog(
-            i, u'"Set CR Capacity Factor for linktype {i}'.format(i=i))
+            i, u'"Set CR Capacity Factor for CR-Function {cr_type}, used {used_in} times in linktypes {lt}'.format(
+                cr_type=cr_type,
+                used_in=used_in, lt=ref_link_types))
     addIn.UpdateProgressDialog(n_cr_functions)
     addIn.CloseProgressDialog()
-    addIn.ReportMessage(u'Capacity Factors set for {i} linktypes'.format(i=i),
+    addIn.ReportMessage(u'Capacity Factors set for {i} CR-Functions'.format(i=i),
                         messageType=2)
         
 
@@ -35,7 +50,7 @@ def main(Visum, capacityFactor, addIn):
 if __name__ == '__main__':
     argparse = ArgumentParser()
     argparse.add_argument('-f', help='CapacityFactor',
-                          dest='capacityFactor', default=11.0)
+                          dest='capacityFactor', default=12.0)
     options = argparse.parse_args()
 
     if len(sys.argv) > 1:
