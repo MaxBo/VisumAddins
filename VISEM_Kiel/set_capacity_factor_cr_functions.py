@@ -7,7 +7,7 @@ if __package__ is None:
     from os import path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-from helpers.visumpy_with_progress_dialog import AddIn, AddInState
+from helpers.visumpy_with_progress_dialog import AddIn, AddInState, AddInParameter
 
 
 def main(Visum, capacityFactor, addIn):
@@ -26,7 +26,9 @@ def main(Visum, capacityFactor, addIn):
     addIn.ShowProgressDialog(
         u"Set CR Capacity Factors",
         u"Set CR Capacity Factors", n_cr_functions, setTimeMode=True)
+    done = 0
     for i, crFunc in enumerate(crFuncUsage):
+        done += 1
         cr_type =  int(crFunc[0])
         used_in = int(crFunc[1])
         ref_link_types = crFunc[2]
@@ -42,27 +44,34 @@ def main(Visum, capacityFactor, addIn):
                 used_in=used_in, lt=ref_link_types))
     addIn.UpdateProgressDialog(n_cr_functions)
     addIn.CloseProgressDialog()
-    addIn.ReportMessage(u'Capacity Factors set for {i} CR-Functions'.format(i=i),
+    addIn.ReportMessage(u'Capacity Factors set to {v} for {i} CR-Functions'.format(i=done,
+                                                                                   v=capacityFactor),
                         messageType=2)
         
 
 
 if __name__ == '__main__':
-    argparse = ArgumentParser()
-    argparse.add_argument('-f', help='CapacityFactor',
-                          dest='capacityFactor', default=12.0)
-    options = argparse.parse_args()
-
     if len(sys.argv) > 1:
         addIn = AddIn()
     else:
         addIn = AddIn(Visum)    
+
+    if addIn.IsInDebugMode:
+        app = wx.PySimpleApp(0)
+        Visum = addIn.VISUM
+        addInParam = AddInParameter(addIn, None)
+    else:
+        addInParam = AddInParameter(addIn, Parameter)
+        
+    default_params = {'Capacity_Factor': 11.0}
+    param = addInParam.Check(True, default_params)
+    capacityFactor = param['Capacity_Factor']    
         
     if addIn.State != AddInState.OK:
         addIn.ReportMessage(addIn.ErrorObjects[0].ErrorMessage)
     else:
         try:            
-            main(Visum, options.capacityFactor, addIn)
+            main(Visum, capacityFactor, addIn)
         except:
             addIn.HandleException(addIn.TemplateText.MainApplicationError)
 

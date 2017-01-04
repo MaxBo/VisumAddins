@@ -4,9 +4,10 @@
         <AddInID>GGR_SET_CAPACITY_FACTOR</AddInID>
         <AddInName>Set CapacityFactor in CRFunctions</AddInName>
         <AddInPath>GGR KIEL</AddInPath>
+        <AddInParaDlgScript>set_capacity_factor_cr_functions_dlg.py</AddInParaDlgScript>
         <AddInBodyScript>set_capacity_factor_cr_functions.py</AddInBodyScript>
         <AddInOperation>true</AddInOperation>
         <AddInAutoMenu>true</AddInAutoMenu>
-        <AddInAutoShowPara>false</AddInAutoShowPara>
+        <AddInAutoShowPara>true</AddInAutoShowPara>
     </VisumAddIn>
 </VisumAddInCollection>

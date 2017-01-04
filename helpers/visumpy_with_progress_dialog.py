@@ -2,7 +2,7 @@
 
 
 import wx
-from VisumPy.AddIn import AddIn as AddIn_Base, AddInState 
+from VisumPy.AddIn import AddIn as AddIn_Base, AddInState, AddInParameter
 
 
 class AddIn(AddIn_Base):
