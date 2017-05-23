@@ -2,7 +2,9 @@
 import os
 
 
-def get_folders(Visum):
+def get_folders(Visum,
+                exe_folder='ExecutableFolder',
+                project_folder='ProjectFolder'):
     """
     return folders
     """
@@ -20,8 +22,8 @@ def get_folders(Visum):
         print('ggr.pfd not found in {}'.format(appdata_path))
         raise e
     try:
-        pythonpath = os.path.join(folders['ExecutableFolder'], 'python')
-        project_folder = folders['ProjectFolder']
+        pythonpath = os.path.join(folders[exe_folder], 'python')
+        project_folder = folders[project_folder]
     except KeyError as e:
         print('key not found in {pdf}'.format(pfd))
         raise e

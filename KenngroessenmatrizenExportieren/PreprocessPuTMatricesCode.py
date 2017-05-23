@@ -23,7 +23,7 @@ import tables
 from tables.exceptions import NoSuchNodeError
 import VisumPy
 from KenngroessenmatrizenExportierenBody import ExportSkims, NoSuchNodeError
-
+import VisumPy.AddIn
 
 class PreprocessMatrices(ExportSkims):
     """Preprocess the Public Transport Matrices"""
@@ -31,8 +31,10 @@ class PreprocessMatrices(ExportSkims):
 
     def __init__(self, Visum):
         self.Visum = Visum
+
         super(PreprocessMatrices, self).__init__(Visum)
-        pythonpath, project_folder = get_folders(Visum)
+        pythonpath, project_folder = get_folders(Visum,
+                                                 exe_folder='TDMKSFolder')
         self.pythonpath = pythonpath
         self.project_folder = project_folder
         self.scenario_name = Visum.Net.AttValue('ScenarioCode')
@@ -65,12 +67,14 @@ class PreprocessMatrices(ExportSkims):
 
     def execute(self):
         project_xml_file = os.path.join(self.project_folder, 'project.xml')
-        cmd = '{pythonpath} -m tdmks.main -xml "{project_xml_file}" -n "{scenario_name}" {pp_cmd} --skip_run'
+        cmd = '{pythonpath} -m tdmks.main_xml -xml "{project_xml_file}" -n "{scenario_name}" {pp_cmd} --skip_run'
         full_cmd = cmd.format(pythonpath=self.pythonpath,
                               project_xml_file=project_xml_file,
                               scenario_name=self.scenario_name,
                               pp_cmd=self.preprocess_command
                               )
+        with open(r'C:\temp\test.log', 'w') as f:
+            f.write(full_cmd)
         c = subprocess.Popen(full_cmd,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,

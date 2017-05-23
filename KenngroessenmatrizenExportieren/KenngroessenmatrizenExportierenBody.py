@@ -100,8 +100,10 @@ class ExportSkims(object):
         item = self.Visum.Net.AttValue('CURRENT_TIME_INTERVAL')
         filepath = self.params[self.mode]
 
+        filters = tables.Filters(complevel=2, complib='blosc', shuffle=True)
+
          # Open File
-        with tables.openFile(filepath, 'a') as h:
+        with tables.openFile(filepath, 'a', filters=filters) as h:
 
             #Alle Matrizen
             for m in AllMatrices:

@@ -23,7 +23,7 @@ class ImportPrTDemandMatrices(ImportDemandMatrices):
 
 if __name__ == '__main__':
     import_matrices = ImportPrTDemandMatrices(Visum)
-    import_matrices.import_arrays(mode='prt', tablename='car')
+    import_matrices.import_arrays(mode='car', tablename='car')
 
 
 

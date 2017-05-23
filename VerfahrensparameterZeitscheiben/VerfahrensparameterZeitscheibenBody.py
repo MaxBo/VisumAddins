@@ -91,12 +91,16 @@ class AddTimeSlices(object):
         """load timeslices and add operations"""
         ReadOperations_ReplaceAll = 0
         Visum.Procedures.OpenXmlWithOptions(
-            self.temp_xml,
+            ProcParaPath=self.temp_xml,
             readOperations=False,
             readFunctions=True,
             roType=ReadOperations_ReplaceAll)
         self.remove_group_skim_matrix_calculation()
         self.add_operations()
+
+    def add_time_series(self):
+        """add the time series to the demand"""
+
 
     def remove_group_skim_matrix_calculation(self):
         OPERATIONTYPE_GROUP = 75
@@ -133,11 +137,11 @@ class AddTimeSlices(object):
         # create Group SkimMatrixCalculation if not exists
         if not group_found:
             self.create_group_put_skim_matrix_calculation()
-
         # add for each analysis time the operations
         at = Visum.Procedures.Functions.AnalysisTimes
         n_intervals = at.NumTimeIntervals
         n_time_sclices = 0
+
         for t in range(1, n_intervals + 1):
             time_interval = at.TimeInterval(t)
             is_aggregate = time_interval.AttValue('IsAggregate')
