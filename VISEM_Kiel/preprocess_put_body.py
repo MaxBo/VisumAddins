@@ -3,12 +3,8 @@
 
 import sys
 
-if __package__ is None:
-    from os import path
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
 import numpy as np
-from helpers.visumpy_with_progress_dialog import AddIn, AddInState
+from visumhelpers.visumpy_with_progress_dialog import AddIn, AddInState
 
 
 def main(Visum, addIn):
@@ -47,10 +43,10 @@ Matrix([CODE]="{nc}")* 0.5 * ({f}),
     addIn.ShowProgressDialog(
         u"Calculate Percieved Journey Time Matrices for {N} Activities".format(N=n_activities),
         "Calculate Percieved Journey Time Matrices", n_activities * 10, setTimeMode=True)
-    
+
     for i, act in enumerate(acts):
         c = i * 10
-        
+
         if not act.AttValue('IsHomeActivity'):
             a_code = act.AttValue('Code')
             a_name = act.AttValue('Name')
@@ -58,7 +54,7 @@ Matrix([CODE]="{nc}")* 0.5 * ({f}),
             # get the target matrix
             ref = 'Matrix([CODE]="{}_{}")'.format(skim, a_code)
             m = Visum.Net.Matrices.ItemsByRef(ref).GetAll[0]
-            
+
             c += 1
             progress(addIn, c, a_name, a_code)
 
@@ -113,9 +109,9 @@ Matrix([CODE]="{nc}")* 0.5 * ({f}),
             progress(addIn, c, a_name, a_code)
 
             e = np.array(weighted_skim_matrix.GetValues())
-            
+
             c += 3
-            progress(addIn, c, a_name, a_code)            
+            progress(addIn, c, a_name, a_code)
             np.fill_diagonal(e, 999999)
             m.SetValues(e)
 
@@ -126,9 +122,9 @@ Matrix([CODE]="{nc}")* 0.5 * ({f}),
 
 def progress(addIn, c, a_name, a_code):
     if addIn.ExecutionCanceled:
-        raise RuntimeError('Aborted at Activity {i}'.format(i=i))       
+        raise RuntimeError('Aborted at Activity {i}'.format(i=i))
     addIn.UpdateProgressDialog(c, u'Calculate Matrix PJT_{a} for {b}'.format(
-        a=a_code, b=a_name))        
+        a=a_code, b=a_name))
 
 
 def set_no_connection_formula(ap_code, dm2, pgr,
@@ -174,12 +170,12 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         addIn = AddIn()
     else:
-        addIn = AddIn(Visum)    
-        
+        addIn = AddIn(Visum)
+
     if addIn.State != AddInState.OK:
         addIn.ReportMessage(addIn.ErrorObjects[0].ErrorMessage)
     else:
-        try:            
+        try:
             main(Visum, addIn)
         except:
             addIn.HandleException(addIn.TemplateText.MainApplicationError)

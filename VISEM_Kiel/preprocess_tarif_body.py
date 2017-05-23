@@ -3,12 +3,8 @@
 
 import sys
 
-if __package__ is None:
-    from os import path
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
 import numpy as np
-from helpers.visumpy_with_progress_dialog import AddIn, AddInState
+from visumhelpers.visumpy_with_progress_dialog import AddIn, AddInState
 
 
 def main(Visum, addIn):
@@ -58,12 +54,12 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         addIn = AddIn()
     else:
-        addIn = AddIn(Visum)    
-        
+        addIn = AddIn(Visum)
+
     if addIn.State != AddInState.OK:
         addIn.ReportMessage(addIn.ErrorObjects[0].ErrorMessage)
     else:
-        try:            
+        try:
             main(Visum, addIn)
         except:
             addIn.HandleException(addIn.TemplateText.MainApplicationError)

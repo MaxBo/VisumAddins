@@ -3,12 +3,8 @@
 
 import sys
 
-if __package__ is None:
-    from os import path
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
 import numpy as np
-from helpers.visumpy_with_progress_dialog import AddIn, AddInState, AddInParameter
+from visumhelpers.visumpy_with_progress_dialog import AddIn, AddInState, AddInParameter
 
 
 def main(Visum, addIn, demand_model):
@@ -38,7 +34,7 @@ def delete_all_person_groups(dm, addIn):
     for ds in dm.PersonGroups:
         i += 1
         if addIn.ExecutionCanceled:
-            raise RuntimeError(u'Aborted at Person Group {i}'.format(i=i))       
+            raise RuntimeError(u'Aborted at Person Group {i}'.format(i=i))
         Visum.Net.RemovePersonGroup(ds)
 
         addIn.UpdateProgressDialog(
@@ -63,7 +59,7 @@ def delete_all_activities(dm, addIn):
     for ds in dm.Activities:
         i += 1
         if addIn.ExecutionCanceled:
-            raise RuntimeError(u'Aborted at Activity {i}'.format(i=i))       
+            raise RuntimeError(u'Aborted at Activity {i}'.format(i=i))
         Visum.Net.RemoveActivity(ds)
 
         addIn.UpdateProgressDialog(
@@ -89,7 +85,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         addIn = AddIn()
     else:
-        addIn = AddIn(Visum)    
+        addIn = AddIn(Visum)
 
     if addIn.IsInDebugMode:
         app = wx.PySimpleApp(0)
@@ -97,15 +93,15 @@ if __name__ == '__main__':
         addInParam = AddInParameter(addIn, None)
     else:
         addInParam = AddInParameter(addIn, Parameter)
-        
+
     default_params = {'DemandModel': 'VisemT'}
     param = addInParam.Check(True, default_params)
-    demand_model = param['DemandModel']    
-        
+    demand_model = param['DemandModel']
+
     if addIn.State != AddInState.OK:
         addIn.ReportMessage(addIn.ErrorObjects[0].ErrorMessage)
     else:
-        try:            
+        try:
             main(Visum, addIn, demand_model)
         except:
             addIn.HandleException(addIn.TemplateText.MainApplicationError)
