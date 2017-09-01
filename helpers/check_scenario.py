@@ -40,9 +40,15 @@ def create_modifications(Visum, scenario_name, group, net_attribute ):
 
     modification.SetAttValue('Group', group)
     # defnie the modification
-    modification.StartEditModification()
-    Visum.Net.SetAttValue(net_attribute, scenario_name)
-    modification.EndEditModification()
+    tra_file = modification.AttValue('TraFile')
+    with open(tra_file, 'w') as f:
+        f.write('''$VISION
+$VERSION:VERSNR;FILETYPE;LANGUAGE
+10.000;Trans;DEU
+$NETZ:{na}
+{sn}
+'''.format(na=net_attribute, sn=scenario_name))
+
     # set it to incompatible to other modifications in group "ScenarioNames"
     exclusions = []
     for m in project.Modifications:
