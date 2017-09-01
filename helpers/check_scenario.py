@@ -12,6 +12,8 @@ if __package__ is None:
     from os import sys, path
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
+import os
+import helpers.wingdbstub
 from helpers.get_params import validate_scenario_from_visum
 
 
@@ -39,8 +41,12 @@ def create_modifications(Visum, scenario_name, group, net_attribute ):
     modification = get_modification_by_code(project, code)
 
     modification.SetAttValue('Group', group)
-    # defnie the modification
-    tra_file = modification.AttValue('TraFile')
+    # define the modification
+    filetype_ModelTransfer = 71
+    base_path = os.path.dirname(os.path.dirname(
+        Visum.GetPath(filetype_ModelTransfer)))
+    tra_file = os.path.join(base_path, 'Modifications',
+                            modification.AttValue('TraFile'))
     with open(tra_file, 'w') as f:
         f.write('''$VISION
 $VERSION:VERSNR;FILETYPE;LANGUAGE
