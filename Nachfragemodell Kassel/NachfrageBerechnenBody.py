@@ -30,7 +30,7 @@ class CalcDemand(object):
 
     def execute(self):
         project_xml_file = os.path.join(self.project_folder, 'project.xml')
-        cmd = '{pythonpath} -m gui_vm.main -o "{project_xml_file}" -s "{scenario_name}" --run-specific {run}{balancing}'
+        cmd = '"{pythonpath}" -m gui_vm.main -o "{project_xml_file}" -s "{scenario_name}" --run-specific {run}{balancing}'
         full_cmd = cmd.format(pythonpath=self.pythonpath,
                                         project_xml_file=project_xml_file,
                                         scenario_name='"{}"'.format(

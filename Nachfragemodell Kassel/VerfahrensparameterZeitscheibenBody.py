@@ -37,7 +37,7 @@ class AddTimeSlices(object):
     def create_xml(self):
         """create time interval xml and import into Visum"""
         #project_xml_file = os.path.join(self.project_folder, 'project.xml')
-        cmd = '{pythonpath} -m gui_vm.write_time_slice_xml -f "{project_folder}" -s "{scenario_name}"'
+        cmd = '"{pythonpath}" -m gui_vm.write_time_slice_xml -f "{project_folder}" -s "{scenario_name}"'
         full_cmd = cmd.format(pythonpath=self.pythonpath,
                                         project_folder=self.project_folder.rstrip("\\"),
                                         scenario_name=self.scenario_name)

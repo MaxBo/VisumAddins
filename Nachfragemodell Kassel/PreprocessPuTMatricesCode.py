@@ -44,10 +44,10 @@ class PreprocessMatrices(ExportSkims):
         """Exportiere die Verkehrszellendefinition"""
         filepath = self.params[self.mode]
             # Open File
-        with tables.openFile(filepath, 'a') as h:
+        with tables.open_file(filepath, 'a') as h:
             # Tabelle Bezirke
             try:
-                zonetable = h.getNode(h.root.Bezirke)
+                zonetable = h.get_node(h.root.Bezirke)
                 zonetable.remove()
             except NoSuchNodeError:
                 pass
@@ -67,14 +67,14 @@ class PreprocessMatrices(ExportSkims):
 
     def execute(self):
         project_xml_file = os.path.join(self.project_folder, 'project.xml')
-        cmd = '{pythonpath} -m tdmks.main_xml -xml "{project_xml_file}" -n "{scenario_name}" {pp_cmd} --skip_run'
+        cmd = '"{pythonpath}" -m tdmks.main_xml -xml "{project_xml_file}" -n "{scenario_name}" {pp_cmd} --skip_run'
         full_cmd = cmd.format(pythonpath=self.pythonpath,
                               project_xml_file=project_xml_file,
                               scenario_name=self.scenario_name,
                               pp_cmd=self.preprocess_command
                               )
-        with open(r'C:\temp\test.log', 'w') as f:
-            f.write(full_cmd)
+        #with open(r'C:\temp\test.log', 'w') as f:
+            #f.write(full_cmd)
         c = subprocess.Popen(full_cmd,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,

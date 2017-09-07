@@ -103,7 +103,7 @@ class ExportSkims(object):
         filters = tables.Filters(complevel=2, complib='blosc', shuffle=True)
 
          # Open File
-        with tables.openFile(filepath, 'a', filters=filters) as h:
+        with tables.open_file(filepath, 'a', filters=filters) as h:
 
             #Alle Matrizen
             for m in AllMatrices:
@@ -125,13 +125,13 @@ class ExportSkims(object):
 
                     #Knoten visum?
                     try:
-                        group = h.getNode(root, 'visum')
+                        group = h.get_node(root, 'visum')
                     except NoSuchNodeError:
                         group = h.createGroup(root,'visum')
                     #addIn.ReportMessage(data)
                     try:
                         # Existiert der Knoten(Tabelle)
-                        table_in_hdf5 = h.getNode(group, hdf5_name)
+                        table_in_hdf5 = h.get_node(group, hdf5_name)
 
                     except NoSuchNodeError:
                         # Wenn nicht :

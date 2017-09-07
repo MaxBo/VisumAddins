@@ -33,7 +33,8 @@ import VisumPy.AddIn
 from VisumPy.AddIn import AddIn, AddInState, AddInParameter
 from VisumPy.helpers import GetMatrix, SetMatrix, GetMulti, __getMatrixByCode as getMatrixByCode
 from VisumPy.matrices import fromNumArray
-l = r'C:\temp\test.log'
+import tempfile
+temp_logfile = tempfile.mktemp(suffix="log")
 
 class ImportDemandMatrices(object):
 
@@ -87,7 +88,7 @@ class ImportDemandMatrices(object):
         """Import Array """
         #tsits = self.get_time_series(mode)
         # Free Matrix NO
-        with open(l, 'w') as fi:
+        with open(temp_logfile, 'w') as fi:
 
             matrices = self.Visum.Net.Matrices.GetAll
             all_numbers = set(range(1, 255))
@@ -258,14 +259,14 @@ class ImportDemandMatrices(object):
             a.SetAttValue('MatrixType', 'MATRIXTYPE_DEMAND')
 
         # Fill Matrix
-        with tables.openFile(self.filepath, 'r') as h:
+        with tables.open_file(self.filepath, 'r') as h:
             # zone definition in the hdf5-file
-            zones_in_hdf5 = h.getNode(h.root, 'zones')
+            zones_in_hdf5 = h.get_node(h.root, 'zones')
             zones_h5 = zones_in_hdf5.col('zone_no')
             try:
                 if not ti.AttValue('IsAggregate'):
                     if tablename != 'all':
-                        table_in_hdf5 = h.getNode(h.root.modes_ts, tablename)
+                        table_in_hdf5 = h.get_node(h.root.modes_ts, tablename)
                         tt = table_in_hdf5[z]
                         fi.writelines('{}'.format(z))
                     else:
@@ -278,7 +279,7 @@ class ImportDemandMatrices(object):
                 # für aggregate 24h
                 else:
                     if tablename != 'all':
-                        table_in_hdf5 = h.getNode(h.root.modes, tablename)
+                        table_in_hdf5 = h.get_node(h.root.modes, tablename)
                         tt = table_in_hdf5[:]
                     else:
                         tt = 0
