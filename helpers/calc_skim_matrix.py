@@ -45,7 +45,7 @@ def calc2(item, filepath, Visum, addIn):
     ttbp.SetTimeIntervalEnd(end)    # Time in Seconds
 
     # Open File
-    with tables.openFile(filepath, 'a') as h:
+    with tables.open_file(filepath, 'a') as h:
 
         #Alle Matrizen
         AllMatrices = Visum.Net.Matrices.GetAll
@@ -69,7 +69,7 @@ def calc2(item, filepath, Visum, addIn):
 
                 try:
                     # Existiert der Knoten(Tabelle)
-                    table_in_hdf5 = h.getNode(root, name)
+                    table_in_hdf5 = h.get_node(root, name)
 
                 except NoSuchNodeError:
                     # Wenn nicht :
@@ -109,7 +109,7 @@ def calc2(item, filepath, Visum, addIn):
 
         # Tabelle Bezirke
         try:
-            zonetable = h.getNode(h.root.Bezirke)
+            zonetable = h.get_node(h.root.Bezirke)
         except NoSuchNodeError:
             zones = Visum.Net.Zones
             nummer = numpy.array(VisumPy.helpers.GetMulti(zones, 'No'))

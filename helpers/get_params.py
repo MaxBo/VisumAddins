@@ -44,7 +44,7 @@ def get_params(project_folder, scenario_name, params,
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
     params_to_read = ' '.join(('"{param}"'.format(param=param) for param in params))
-    cmd = '{pythonpath} -m gui_vm.get_param_from_config -o "{project_xml_file}" -s "{scenario_name}" -p {params_to_read}'
+    cmd = '"{pythonpath}" -m gui_vm.get_param_from_config -o "{project_xml_file}" -s "{scenario_name}" -p {params_to_read}'
     c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
                                     project_xml_file=project_xml_file,
                                     scenario_name=scenario_name,
@@ -122,7 +122,7 @@ def get_scenarios(project_folder, pythonpath=r'', **kwargs):
         the available scenarios
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
-    cmd = '{pythonpath} -m gui_vm.get_scenarios_from_config -o "{project_xml_file}"'
+    cmd = '"{pythonpath}" -m gui_vm.get_scenarios_from_config -o "{project_xml_file}"'
     c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
                                     project_xml_file=project_xml_file),
                          stdout=subprocess.PIPE,
@@ -152,7 +152,7 @@ def clone_scenario(project_folder, pythonpath,
     scenario_name : str
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
-    cmd = '{pythonpath} -m gui_vm.clone_scenario -o "{project_xml_file}" -t "{template}" -s "{new_scenario}"'
+    cmd = '"{pythonpath}" -m gui_vm.clone_scenario -o "{project_xml_file}" -t "{template}" -s "{new_scenario}"'
     c = subprocess.Popen(cmd.format(pythonpath=pythonpath,
                                     project_xml_file=project_xml_file,
                                     template=template,
@@ -208,7 +208,7 @@ def validate_scenario(project_folder,
         the available scenarios
     """
     project_xml_file = os.path.join(project_folder, 'project.xml')
-    cmd = '{pythonpath} -m gui_vm.validate_scenario -f "{project_xml_file}" -s {sc}'
+    cmd = '"{pythonpath}" -m gui_vm.validate_scenario -f "{project_xml_file}" -s {sc}'
     fullcmd = cmd.format(pythonpath=pythonpath,
                          project_xml_file=project_xml_file,
                          sc=scenario_name)
