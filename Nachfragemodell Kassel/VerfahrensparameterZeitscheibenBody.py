@@ -17,7 +17,7 @@ import os
 import sys
 import subprocess
 import getpass
-import VisumPy.AddIn
+from VisumPy.AddIn import AddIn, AddInParameter, AddInState
 import tempfile
 
 
