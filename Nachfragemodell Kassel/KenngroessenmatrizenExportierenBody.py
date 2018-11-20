@@ -167,7 +167,7 @@ class ExportSkims(object):
         m_shape = data.shape          # Get Shape
         m_row = m_shape[0]             # Get Row Number
         m_col = m_shape[1]              # Get Col Number
-        n_time_sclices = self.Visum.Net.AttValue('NUM_OF_TIMESLICES')
+        n_time_sclices = int(self.Visum.Net.AttValue('NUM_OF_TIMESLICES'))
 
         arr_shape = (n_time_sclices, m_row, m_col)
         return arr_shape
