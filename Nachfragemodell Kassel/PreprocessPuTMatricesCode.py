@@ -60,7 +60,7 @@ class PreprocessMatrices(ExportSkims):
                                       'zone_name'],
                                        titles=['Bezirke', 'BezirksNamen'],
                                        formats=['<i4', 'S255'])
-            zonetable = h.createTable(h.root, 'Bezirke', rec)
+            zonetable = h.create_table(h.root, 'Bezirke', rec)
 
             h.flush()
 
