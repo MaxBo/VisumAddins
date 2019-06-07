@@ -97,7 +97,7 @@ class ExportSkims(object):
     def export_arrays(self):
         """Export Array """
         AllMatrices = self.Visum.Net.Matrices.GetAll
-        item = self.Visum.Net.AttValue('CURRENT_TIME_INTERVAL')
+        item = int(self.Visum.Net.AttValue('CURRENT_TIME_INTERVAL'))
         filepath = self.params[self.mode]
 
         filters = tables.Filters(complevel=2, complib='blosc', shuffle=True)
@@ -117,7 +117,7 @@ class ExportSkims(object):
                     name = latinize(m.AttValue('Name'))
                     code = m.AttValue('Code')
                     hdf5_name = self.visum2hdf_matrix_names.get(code, code)
-                    no = m.AttValue('No')
+                    no = int(m.AttValue('No'))
 
                     root = h.root
                     #Matrix als Numpy array (hat funktion shape)
@@ -127,7 +127,7 @@ class ExportSkims(object):
                     try:
                         group = h.get_node(root, 'visum')
                     except NoSuchNodeError:
-                        group = h.createGroup(root,'visum')
+                        group = h.create_group(root,'visum')
                     #addIn.ReportMessage(data)
                     try:
                         # Existiert der Knoten(Tabelle)
@@ -143,7 +143,7 @@ class ExportSkims(object):
 
                         # create Table (in hdf5 file)
                         ##arrname = code+str(t)
-                        table_in_hdf5 = h.createArray(group, hdf5_name, arr)
+                        table_in_hdf5 = h.create_array(group, hdf5_name, arr)
 
                     # Fill table with Matrix
 
