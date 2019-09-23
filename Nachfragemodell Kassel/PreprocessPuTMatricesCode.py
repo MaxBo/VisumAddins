@@ -12,7 +12,7 @@
 
 if __package__ is None:
     from os import sys, path
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    sys.path.append(path.dirname(path.abspath('.')))
 
 from helpers.get_folders import get_folders
 
@@ -39,10 +39,10 @@ class PreprocessMatrices(ExportSkims):
         self.project_folder = project_folder
         self.scenario_name = Visum.Net.AttValue('ScenarioCode')
 
-
     def export_zones(self):
         """Exportiere die Verkehrszellendefinition"""
         filepath = self.params[self.mode]
+
             # Open File
         with tables.open_file(filepath, 'a') as h:
             # Tabelle Bezirke
@@ -63,7 +63,7 @@ class PreprocessMatrices(ExportSkims):
             zonetable = h.create_table(h.root, 'Bezirke', rec)
 
             h.flush()
-
+        #raise ValueError('{}'.format(rec))
 
     def execute(self):
         project_xml_file = os.path.join(self.project_folder, 'project.xml')
@@ -75,6 +75,7 @@ class PreprocessMatrices(ExportSkims):
                               )
         #with open(r'C:\temp\test.log', 'w') as f:
             #f.write(full_cmd)
+        #raise ValueError('{}'.format(full_cmd))
         c = subprocess.Popen(full_cmd,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,

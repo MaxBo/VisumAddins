@@ -15,7 +15,7 @@
 
 if __package__ is None:
     from os import sys, path
-    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    sys.path.append(path.dirname(path.abspath('.')))
 
 from helpers.get_folders import get_folders
 from helpers.get_params import get_params_from_visum

@@ -6,6 +6,8 @@
 # Author:      Max Bohnet
 #-------------------------------------------------------------------------------
 
+import PreprocessPuTMatricesCode
+reload(PreprocessPuTMatricesCode)
 
 from PreprocessPuTMatricesCode import PreprocessMatrices
 
